@@ -31,16 +31,28 @@ function MainApp() {
 
   // Business Information
   const [businessInfo, setBusinessInfo] = useState(() => {
-    const saved = localStorage.getItem('msme_business_info');
-    return saved ? JSON.parse(saved) : {
-      businessName: 'Lakshmi Enterprise',
-      name: 'Lakshmi Enterprise',
-      tagline: 'Wholesale & Retail Commercial Trading',
-      phone: '+91 9876543210',
-      email: 'contact@lakshmi.in',
-      gstin: '29ABCDE1234F1Z5',
-      address: '102 Market Road, Bengaluru - 560001'
-    };
+    try {
+      const saved = localStorage.getItem('msme_business_info');
+      return saved ? JSON.parse(saved) : {
+        businessName: 'Lakshmi Enterprise',
+        name: 'Lakshmi Enterprise',
+        tagline: 'Wholesale & Retail Commercial Trading',
+        phone: '+91 9876543210',
+        email: 'contact@lakshmi.in',
+        gstin: '29ABCDE1234F1Z5',
+        address: '102 Market Road, Bengaluru - 560001'
+      };
+    } catch {
+      return {
+        businessName: 'Lakshmi Enterprise',
+        name: 'Lakshmi Enterprise',
+        tagline: 'Wholesale & Retail Commercial Trading',
+        phone: '+91 9876543210',
+        email: 'contact@lakshmi.in',
+        gstin: '29ABCDE1234F1Z5',
+        address: '102 Market Road, Bengaluru - 560001'
+      };
+    }
   });
 
   // Toast Notification Queue
@@ -218,14 +230,86 @@ function MainApp() {
   );
 }
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#0d1117',
+          color: '#ffffff',
+          padding: '2rem',
+          textAlign: 'center',
+          fontFamily: 'system-ui, sans-serif'
+        }}>
+          <h2 style={{ fontSize: '1.8rem', marginBottom: '1rem', color: '#fcec4d' }}>BizPartner AI Workspace</h2>
+          <p style={{ color: '#8b949e', maxWidth: '520px', marginBottom: '2rem', lineHeight: 1.6 }}>
+            The application encountered a display refresh requirement. Click below to clear stored cache and load cleanly:
+          </p>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button
+              onClick={() => {
+                localStorage.clear();
+                window.location.reload();
+              }}
+              style={{
+                padding: '0.75rem 1.5rem',
+                borderRadius: '8px',
+                background: '#fcec4d',
+                color: '#000000',
+                border: 'none',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              Reset Session & Reload
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                padding: '0.75rem 1.5rem',
+                borderRadius: '8px',
+                background: 'rgba(255,255,255,0.1)',
+                color: '#ffffff',
+                border: '1px solid rgba(255,255,255,0.2)',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <MainApp />
-        </AuthProvider>
-      </LanguageProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <MainApp />
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
