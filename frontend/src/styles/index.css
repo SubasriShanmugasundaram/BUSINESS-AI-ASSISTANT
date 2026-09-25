@@ -1,0 +1,11 @@
+/* ==========================================================
+   BIZPARTNER AI — DESIGN SYSTEM ENTRYPOINT
+   Modular CSS Architecture
+   ========================================================== */
+
+@import './tokens.css';
+@import './globals.css';
+@import './typography.css';
+@import './layout.css';
+@import './components.css';
+@import './utilities.css';

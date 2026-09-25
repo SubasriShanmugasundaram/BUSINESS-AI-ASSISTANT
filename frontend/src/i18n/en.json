@@ -1,0 +1,44 @@
+{
+  "app": {
+    "name": "BizPartner AI",
+    "tagline": "AI-Powered Business Assistant for MSMEs"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "pos": "POS Billing",
+    "products": "Products & Stock",
+    "customers": "Customer Khata",
+    "expenses": "Expenses",
+    "reports": "Reports & Analytics",
+    "aiAssistant": "AI Assistant",
+    "gst": "GST & Tax",
+    "settings": "Settings",
+    "logout": "Sign Out"
+  },
+  "kpi": {
+    "totalSales": "Total Sales",
+    "totalExpenses": "Total Expenses",
+    "netProfit": "Net Profit",
+    "totalCustomers": "Total Customers",
+    "totalProducts": "Total Products",
+    "todaySales": "Today's Sales",
+    "stockValue": "Inventory Value",
+    "lowStock": "Low Stock Alerts"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add New",
+    "search": "Search...",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "amount": "Amount",
+    "print": "Print",
+    "emptyState": "No records found",
+    "retry": "Retry"
+  }
+}

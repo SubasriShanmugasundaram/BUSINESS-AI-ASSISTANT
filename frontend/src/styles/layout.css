@@ -1,0 +1,169 @@
+/* ==========================================================
+   BIZPARTNER AI — LAYOUT & ARCHITECTURAL GRID SYSTEM
+   ========================================================== */
+
+/* Main App Shell Layout */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Main Content Wrapper */
+.main-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevents flex children from overflowing */
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Page Container (Restrained, Editorial Spacing) */
+.page-container {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-5);
+  position: relative;
+  z-index: 1;
+}
+
+/* Architectural Subtle Grid Background */
+.grid-background,
+.page-container,
+.auth-page-wrapper {
+  background-image: 
+    linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: 0 0;
+}
+
+/* Soft Diffused Warm Glow Behind Key Sections */
+.warm-glow-container {
+  position: relative;
+}
+
+.warm-glow-container::before,
+.has-warm-glow::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 20%;
+  right: 20%;
+  height: 220px;
+  background: radial-gradient(ellipse at center, var(--color-glow) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(40px);
+}
+
+/* Page Header Block */
+.page-header {
+  margin-bottom: var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  position: relative;
+  z-index: 2;
+}
+
+/* Responsive Grid Templates */
+.grid-kpi,
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.grid-2col {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.grid-split-equal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+/* POS Layout (Speed & Usability) */
+.pos-layout {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+/* Right-To-Left (RTL) Layout Adaptations for Urdu, Kashmiri, Sindhi */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .app-sidebar {
+  border-right: none;
+  border-left: 1px solid var(--color-border);
+}
+
+[dir="rtl"] .topbar-search svg {
+  left: auto;
+  right: 12px;
+}
+
+[dir="rtl"] .topbar-search input {
+  padding-left: 14px;
+  padding-right: 36px;
+}
+
+[dir="rtl"] .nav-item {
+  text-align: right;
+}
+
+[dir="rtl"] .floating-ai-fab {
+  right: auto;
+  left: 24px;
+}
+
+/* Mobile & Tablet Responsive Breakpoints */
+@media (max-width: 1080px) {
+  .grid-2col,
+  .pos-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: var(--space-3);
+  }
+
+  .grid-kpi {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .grid-split-equal {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-kpi {
+    grid-template-columns: 1fr;
+  }
+}
