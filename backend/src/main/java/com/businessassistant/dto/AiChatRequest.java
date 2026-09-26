@@ -9,6 +9,8 @@ public class AiChatRequest {
 
     private String language = "en";
 
+    private String geminiApiKey;
+
     public AiChatRequest() {
     }
 
@@ -31,5 +33,13 @@ public class AiChatRequest {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public String getGeminiApiKey() {
+        return geminiApiKey;
+    }
+
+    public void setGeminiApiKey(String geminiApiKey) {
+        this.geminiApiKey = geminiApiKey;
     }
 }

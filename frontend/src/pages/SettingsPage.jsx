@@ -19,7 +19,26 @@ export default function SettingsPage({ businessInfo, setBusinessInfo, showToast 
     address: businessInfo?.address || '102 Market Road, Bengaluru - 560001'
   });
 
-  const [saving, setSaving] = useState(false);
+  const [geminiKey, setGeminiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
+  const [cartesiaKey, setCartesiaKey] = useState(() => localStorage.getItem('cartesia_api_key') || '');
+  const [cartesiaVoiceId, setCartesiaVoiceId] = useState(() => localStorage.getItem('cartesia_voice_id') || 'a0e99841-438c-4a64-b679-ae501e7d6091');
+
+  const handleSaveAiKeys = () => {
+    if (geminiKey.trim()) {
+      localStorage.setItem('gemini_api_key', geminiKey.trim());
+    } else {
+      localStorage.removeItem('gemini_api_key');
+    }
+    if (cartesiaKey.trim()) {
+      localStorage.setItem('cartesia_api_key', cartesiaKey.trim());
+    } else {
+      localStorage.removeItem('cartesia_api_key');
+    }
+    if (cartesiaVoiceId.trim()) {
+      localStorage.setItem('cartesia_voice_id', cartesiaVoiceId.trim());
+    }
+    showToast('AI & Voice integration settings saved successfully!', 'success');
+  };
 
   useEffect(() => {
     // Fetch profile from backend
@@ -218,6 +237,68 @@ export default function SettingsPage({ businessInfo, setBusinessInfo, showToast 
                 onClick={() => theme !== 'light' && toggleTheme()}
               >
                 ☀️ Light Mode
+              </button>
+            </div>
+          </div>
+
+          {/* AI & Cartesia Voice Keys Card */}
+          <div className="card">
+            <div className="card-header">
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>✦ AI & Voice Intelligence Engine</h3>
+              <span className={`badge ${geminiKey ? 'badge-success' : 'badge-warning'}`}>
+                {geminiKey ? 'Gemini AI Connected' : 'Local AI Engine'}
+              </span>
+            </div>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+              Connect Google Gemini for deep store reasoning and Cartesia AI Sonic for ultra-realistic neural voice synthesis.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              <div className="form-group">
+                <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Google Gemini API Key</span>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--color-accent-strong)' }}>
+                    {geminiKey ? '✓ Active' : 'Optional (Free Tier)'}
+                  </span>
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Paste your Gemini API key (AIzaSy...)"
+                  value={geminiKey}
+                  onChange={(e) => setGeminiKey(e.target.value)}
+                />
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                  Enables real generative forecasting, dynamic customer queries, and autonomous recommendations.
+                </span>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Cartesia AI Voice API Key</span>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--color-accent-strong)' }}>
+                    {cartesiaKey ? '✓ Cartesia Sonic Active' : 'Optional'}
+                  </span>
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Paste your Cartesia API key"
+                  value={cartesiaKey}
+                  onChange={(e) => setCartesiaKey(e.target.value)}
+                />
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                  Powers ultra-low-latency Sonic multilingual speech synthesis across 23 languages.
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-primary"
+                style={{ alignSelf: 'flex-start' }}
+                onClick={handleSaveAiKeys}
+              >
+                Save AI & Voice Credentials
               </button>
             </div>
           </div>

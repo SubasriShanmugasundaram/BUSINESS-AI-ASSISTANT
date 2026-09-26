@@ -59,23 +59,35 @@ public class AiService {
         String userQuery = request.getMessage().trim();
         String lang = (request.getLanguage() != null && !request.getLanguage().isBlank()) ? request.getLanguage() : "en";
 
-        // 1. Gather targeted factual business context based on query
+        // 1. Determine effective Gemini API key (Request parameter > System Environment > Configured property)
+        String effectiveKey = (request.getGeminiApiKey() != null && !request.getGeminiApiKey().isBlank())
+                ? request.getGeminiApiKey().trim()
+                : this.geminiApiKey;
+
+        if (effectiveKey == null || effectiveKey.isBlank() || effectiveKey.contains("your_gemini")) {
+            String envKey = System.getenv("GEMINI_API_KEY");
+            if (envKey != null && !envKey.isBlank()) {
+                effectiveKey = envKey.trim();
+            }
+        }
+
+        // 2. Gather targeted factual business context based on live database
         String context = buildBusinessContext(userQuery);
 
-        // 2. If Gemini API key is configured, call Gemini with data context
-        if (geminiApiKey != null && !geminiApiKey.isBlank() && !geminiApiKey.contains("your_gemini")) {
+        // 3. If Gemini API key is available, call Gemini with live store telemetry
+        if (effectiveKey != null && !effectiveKey.isBlank() && !effectiveKey.contains("your_gemini")) {
             try {
-                String geminiAnswer = callGemini(userQuery, context, lang);
+                String geminiAnswer = callGemini(userQuery, context, lang, effectiveKey);
                 if (geminiAnswer != null && !geminiAnswer.isBlank()) {
                     List<String> actions = generateSuggestedActions(userQuery);
-                    return new AiChatResponse(geminiAnswer, lang, actions, "Gemini 1.5 Flash + Real Database Context");
+                    return new AiChatResponse(geminiAnswer, lang, actions, "Google Gemini 1.5 Flash (Live Store Context)");
                 }
             } catch (Exception e) {
                 logger.warn("Gemini API call failed: {}. Falling back to internal business intelligence engine.", e.getMessage());
             }
         }
 
-        // 3. High-precision contextual answer generated directly from factual database calculations
+        // 4. High-precision contextual answer generated directly from factual database calculations
         String answer = generateFactualResponse(userQuery, lang);
         List<String> actions = generateSuggestedActions(userQuery);
         return new AiChatResponse(answer, lang, actions, "Direct Business Intelligence Engine (Live Database)");
@@ -138,8 +150,8 @@ public class AiService {
         return sb.toString();
     }
 
-    private String callGemini(String userQuery, String businessContext, String language) throws Exception {
-        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
+    private String callGemini(String userQuery, String businessContext, String language, String apiKey) throws Exception {
+        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
         String systemInstruction = "You are BizPartner AI, a friendly and highly knowledgeable business partner assisting an Indian MSME / retail business owner.\n" +
                 "You must strictly use the provided live business data below to answer accurately with real numbers.\n" +
@@ -176,12 +188,61 @@ public class AiService {
                 JsonNode textNode = candidates.get(0).path("content").path("parts").get(0).path("text");
                 return textNode.asText();
             }
+        } else {
+            logger.warn("Gemini API call failed with status code {}: {}", response.statusCode(), response.body());
         }
         return null;
     }
 
     private String generateFactualResponse(String query, String lang) {
-        String q = query.toLowerCase();
+        String q = query.toLowerCase().trim();
+
+        boolean isGreeting = q.contains("bro") || q.contains("hi") || q.contains("hello") || q.contains("hey") ||
+                q.contains("vanakkam") || q.contains("வணக்கம்") || q.contains("नमस्ते") || q.contains("help") ||
+                q.equals("bro") || q.equals("hi") || q.equals("hello") || q.equals("வணக்கம்");
+
+        if (isGreeting) {
+            List<Sale> sales = saleRepository.findAll();
+            BigDecimal totalSales = sales.stream()
+                    .filter(s -> "Completed".equalsIgnoreCase(s.getStatus()))
+                    .map(Sale::getTotalAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            List<Expense> expenses = expenseRepository.findAll();
+            BigDecimal totalExpenses = expenses.stream()
+                    .map(Expense::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal netProfit = totalSales.subtract(totalExpenses);
+
+            List<Inventory> lowStock = inventoryRepository.findLowStockItems();
+            int lowStockCount = lowStock.size();
+
+            if ("ta".equals(lang)) {
+                return String.format("வணக்கம் நண்பா! நான் உங்கள் BizPartner AI வணிக நுண்ணறிவு கூட்டாளி.\n\n" +
+                        "📊 **கடையின் தற்போதைய நேரலை நிலவரம்:**\n" +
+                        "• மொத்த விற்பனை: ₹%s (%d பில்கள்)\n" +
+                        "• நிகர இயக்க லாபம்: ₹%s\n" +
+                        "• குறைந்த இருப்பு எச்சரிக்கைகள்: %d பொருட்கள்\n\n" +
+                        "கடை வளர்ச்சி, புதிய கொள்முதல், தயாரிப்பு விவரங்கள் அல்லது வரி குறித்து என்னிடம் எதையும் கேளுங்கள்!",
+                        totalSales, sales.size(), netProfit, lowStockCount);
+            } else if ("hi".equals(lang)) {
+                return String.format("नमस्ते भाई! मैं आपका BizPartner AI बिजनेस पार्टनर हूँ।\n\n" +
+                        "📊 **लाइव स्टोर स्थिति:**\n" +
+                        "• कुल बिक्री: ₹%s (%d इनवॉइस)\n" +
+                        "• शुद्ध लाभ: ₹%s\n" +
+                        "• कम स्टॉक वाले उत्पाद: %d\n\n" +
+                        "आप मुझसे इन्वेंट्री, खरीद सिफारिशें या मुनाफे के बारे में कभी भी पूछ सकते हैं!",
+                        totalSales, sales.size(), netProfit, lowStockCount);
+            } else {
+                return String.format("Hey bro! I am your BizPartner AI business partner with real-time access to your store database.\n\n" +
+                        "📊 **Live Store Snapshot:**\n" +
+                        "• Gross Sales: ₹%s across %d transactions\n" +
+                        "• Net Operating Profit: ₹%s\n" +
+                        "• Low Stock Items: %d products\n\n" +
+                        "Ask me anything about purchase recommendations, inventory health, fast-selling products, or financial margins!",
+                        totalSales, sales.size(), netProfit, lowStockCount);
+            }
+        }
 
         boolean isStockQuery = q.contains("run out") || q.contains("low stock") || q.contains("out of stock") || q.contains("stock") ||
                 q.contains("இருப்பு") || q.contains("தீர்ந்து") || q.contains("स्टॉक") || q.contains("खत्म") || q.contains("कमी");
@@ -324,13 +385,58 @@ public class AiService {
             return sb.toString();
         }
 
-        // Default overview
-        return "I am your BizPartner AI assistant. I have live access to your sales, stock, and expense database.\n" +
+        // Default overview with live store telemetry
+        List<Sale> sales = saleRepository.findAll();
+        BigDecimal totalSales = sales.stream()
+                .filter(s -> "Completed".equalsIgnoreCase(s.getStatus()))
+                .map(Sale::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<Expense> expenses = expenseRepository.findAll();
+        BigDecimal totalExpenses = expenses.stream()
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal netProfit = totalSales.subtract(totalExpenses);
+        List<Inventory> lowStock = inventoryRepository.findLowStockItems();
+
+        if ("ta".equals(lang)) {
+            return String.format("வணக்கம்! நான் உங்கள் நேரலை BizPartner AI வணிக நுண்ணறிவு கூட்டாளி.\n\n" +
+                    "📊 **கடை நேரலை நிலவரம் (நேரலை தரவுத்தளம்):**\n" +
+                    "• மொத்த விற்பனை: ₹%s (%d பில்கள்)\n" +
+                    "• நிகர இயக்க லாபம்: ₹%s\n" +
+                    "• குறைந்த இருப்பு எச்சரிக்கை: %d பொருட்கள்\n\n" +
+                    "நீங்கள் கேட்கக்கூடிய கேள்விகள்:\n" +
+                    "• *'எந்தப் பொருட்கள் விரைவில் தீர்ந்துவிடும்?'*\n" +
+                    "• *'இன்று நான் என்ன வாங்க வேண்டும்?'*\n" +
+                    "• *'எனது நிகர லாபம் எவ்வளவு?'*\n" +
+                    "• *'அதிகமாக விற்பனையாகும் பொருள் எது?'*\n\n" +
+                    "💡 *முழுமையான ஜெனரேட்டிவ் AI மற்றும் கார்ட்டீசியா நரம்பியல் குரலுக்கு மேலே உள்ள 'Setup AI Keys' பொத்தானைப் பயன்படுத்தி உங்கள் API Key-களை இணைக்கவும்.*",
+                    totalSales, sales.size(), netProfit, lowStock.size());
+        } else if ("hi".equals(lang)) {
+            return String.format("नमस्ते! मैं आपका BizPartner AI बिजनेस पार्टनर हूँ।\n\n" +
+                    "📊 **स्टोर लाइव स्थिति (डेटाबेस):**\n" +
+                    "• कुल बिक्री: ₹%s (%d इनवॉइस)\n" +
+                    "• शुद्ध लाभ: ₹%s\n" +
+                    "• कम स्टॉक उत्पाद: %d\n\n" +
+                    "आप मुझसे पूछ सकते हैं:\n" +
+                    "• *'कौन से उत्पाद जल्द खत्म हो रहे हैं?'*\n" +
+                    "• *'मुझे आज क्या खरीदना चाहिए?'*\n" +
+                    "• *'मेरा शुद्ध लाभ कितना है?'*\n\n" +
+                    "💡 *संपूर्ण Generative AI और Cartesia Voice के लिए ऊपर 'Setup AI Keys' पर क्लिक करें।*",
+                    totalSales, sales.size(), netProfit, lowStock.size());
+        }
+
+        return String.format("Hello! I am your BizPartner AI business partner with real-time access to your store database.\n\n" +
+                "📊 **Live Store Snapshot:**\n" +
+                "• Gross Sales: ₹%s across %d transactions\n" +
+                "• Net Operating Profit: ₹%s\n" +
+                "• Low Stock Items: %d products\n\n" +
                 "You can ask me questions like:\n" +
                 "• *'Which products may run out soon?'*\n" +
                 "• *'What should I purchase today?'*\n" +
                 "• *'What is my net profit?'*\n" +
-                "• *'Which product sells the most?'*";
+                "• *'Which product sells the most?'*\n\n" +
+                "💡 *Pro-tip: Connect your Google Gemini API Key and Cartesia Voice in the 'Setup AI Keys' drawer above for advanced reasoning and neural voice!*",
+                totalSales, sales.size(), netProfit, lowStock.size());
     }
 
     private List<String> generateSuggestedActions(String query) {

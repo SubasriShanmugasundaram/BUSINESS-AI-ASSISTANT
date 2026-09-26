@@ -65,10 +65,76 @@ export function useVoiceAssistant(currentLangCode = 'en') {
     }
   };
 
-  const speak = (text) => {
+  const currentAudioRef = useRef(null);
+
+  const speak = async (text) => {
+    stopSpeaking();
+    const cleanText = text.replace(/[*#_•`]/g, '').trim();
+    if (!cleanText) return;
+
+    const cartesiaKey = localStorage.getItem('cartesia_api_key') || import.meta.env.VITE_CARTESIA_API_KEY;
+
+    // 1. If Cartesia API key is available, use Cartesia Sonic multilingual TTS
+    if (cartesiaKey && cartesiaKey.trim().length > 10) {
+      try {
+        setIsSpeaking(true);
+        const voiceId = localStorage.getItem('cartesia_voice_id') || 'a0e99841-438c-4a64-b679-ae501e7d6091';
+        
+        // Cartesia supported language codes for sonic-multilingual (en, hi, etc.)
+        const cartesiaLang = ['hi', 'en', 'es', 'fr', 'de', 'ja', 'zh', 'pt', 'it'].includes(currentLangCode) 
+          ? currentLangCode 
+          : 'en';
+
+        const response = await fetch('https://api.cartesia.ai/tts/bytes', {
+          method: 'POST',
+          headers: {
+            'Cartesia-Version': '2024-06-10',
+            'X-API-Key': cartesiaKey.trim(),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model_id: 'sonic-multilingual',
+            transcript: cleanText.substring(0, 1000), // Cartesia chunk safe limit
+            voice: {
+              mode: 'id',
+              id: voiceId
+            },
+            output_format: {
+              container: 'wav',
+              encoding: 'pcm_s16le',
+              sample_rate: 24000
+            },
+            language: cartesiaLang
+          })
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const audioUrl = URL.createObjectURL(blob);
+          const audio = new Audio(audioUrl);
+          currentAudioRef.current = audio;
+          audio.onended = () => setIsSpeaking(false);
+          audio.onerror = () => {
+            setIsSpeaking(false);
+            fallbackWebSpeech(cleanText);
+          };
+          await audio.play();
+          return;
+        } else {
+          console.warn('Cartesia TTS responded with status', response.status, '- falling back to Web Speech API');
+        }
+      } catch (err) {
+        console.warn('Cartesia TTS call failed, using Web Speech API fallback:', err);
+      }
+    }
+
+    fallbackWebSpeech(cleanText);
+  };
+
+  const fallbackWebSpeech = (cleanText) => {
+    // 2. Fallback to native Web Speech API
     if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel(); // Stop any ongoing speech
-      const cleanText = text.replace(/[*#_•`]/g, ''); // Clean markdown formatting
+      window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = LANGUAGE_BCP47_MAP[currentLangCode] || 'en-IN';
       utterance.rate = 1.0;
@@ -82,10 +148,15 @@ export function useVoiceAssistant(currentLangCode = 'en') {
   };
 
   const stopSpeaking = () => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
+      currentAudioRef.current = null;
+    }
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      setIsSpeaking(false);
     }
+    setIsSpeaking(false);
   };
 
   return {

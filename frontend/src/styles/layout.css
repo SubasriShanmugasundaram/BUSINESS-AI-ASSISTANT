@@ -91,19 +91,54 @@
   margin-bottom: var(--space-4);
 }
 
-.grid-split-equal {
+.grid-split-equal,
+.grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-4);
   margin-bottom: var(--space-4);
 }
 
+@media (max-width: 768px) {
+  .grid-split-equal,
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* POS Layout (Speed & Usability) */
-.pos-layout {
+.pos-layout,
+.sale-composer-grid {
   display: grid;
-  grid-template-columns: 1.55fr 1fr;
+  grid-template-columns: minmax(0, 1fr) 360px;
   gap: var(--space-4);
   align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .pos-layout,
+  .sale-composer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* POS Item Line-Item Bar */
+.item-picker-bar {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.2fr auto;
+  gap: 0.85rem;
+  align-items: flex-end;
+  background: var(--color-surface-subtle);
+  padding: 1.15rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .item-picker-bar {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Right-To-Left (RTL) Layout Adaptations for Urdu, Kashmiri, Sindhi */

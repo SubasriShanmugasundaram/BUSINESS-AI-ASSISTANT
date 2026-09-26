@@ -10,8 +10,10 @@ import {
   UserIcon
 } from '../components/Icons';
 import { api } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
+  const { t } = useLanguage();
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -178,10 +180,10 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
       <div className="page-header">
         <div className="page-title-group">
           <h1>
-            Record New Sale
+            {t('Record New Sale')}
           </h1>
           <p className="page-subtitle">
-            Create multi-item customer invoices, compute taxes, and issue receipts.
+            {t('Create multi-item customer invoices, compute taxes, and issue receipts.')}
           </p>
         </div>
       </div>
@@ -192,25 +194,25 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
           {/* Customer & Transaction Info Card */}
           <div className="card" style={{ marginBottom: '1.5rem' }}>
             <div className="card-header">
-              <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>1. Customer & Date</h3>
+              <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>{t('1. Customer & Date')}</h3>
               <button
                 type="button"
                 className="btn btn-sm btn-secondary"
                 onClick={() => setIsQuickCustomerOpen(true)}
               >
-                <PlusIcon size={14} /> + New Customer
+                <PlusIcon size={14} /> {t('+ New Customer')}
               </button>
             </div>
 
             <div className="grid-2">
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>Select Customer <span className="required">*</span></label>
+                <label>{t('Select Customer')} <span className="required">*</span></label>
                 <select
                   className="form-select"
                   value={selectedCustomerId}
                   onChange={(e) => setSelectedCustomerId(e.target.value)}
                 >
-                  <option value="">-- Choose Customer --</option>
+                  <option value="">-- {t('Select Customer')} --</option>
                   {customers.map(c => (
                     <option key={c.id} value={c.id}>
                       {c.name} ({c.phone})
@@ -225,7 +227,7 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
               </div>
 
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>Sale / Invoice Date <span className="required">*</span></label>
+                <label>{t('Sale / Invoice Date')} <span className="required">*</span></label>
                 <input
                   type="date"
                   className="form-control"
@@ -239,22 +241,22 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
           {/* Product Line Item Picker Card */}
           <div className="card">
             <div className="card-header">
-              <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>2. Add Products to Cart</h3>
+              <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>{t('2. Add Products to Cart')}</h3>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Select item from catalog or customize rate
+                {t('Select item from catalog or customize rate')}
               </span>
             </div>
 
             {/* Picker Form */}
             <form onSubmit={handleAddItem} className="item-picker-bar">
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label style={{ fontSize: '0.75rem' }}>Product</label>
+                <label style={{ fontSize: '0.75rem' }}>{t('Product')}</label>
                 <select
                   className="form-select"
                   value={currentProductId}
                   onChange={(e) => handleProductSelect(e.target.value)}
                 >
-                  <option value="">-- Select Product --</option>
+                  <option value="">-- {t('Select Product')} --</option>
                   {products.map(p => (
                     <option key={p.id} value={p.id}>
                       {p.name} (₹{Number(p.sellingPrice).toFixed(2)})
@@ -264,7 +266,7 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
               </div>
 
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label style={{ fontSize: '0.75rem' }}>Quantity</label>
+                <label style={{ fontSize: '0.75rem' }}>{t('Quantity')}</label>
                 <input
                   type="number"
                   min="1"
@@ -275,7 +277,7 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
               </div>
 
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label style={{ fontSize: '0.75rem' }}>Unit Price (₹)</label>
+                <label style={{ fontSize: '0.75rem' }}>{t('Unit Price (₹)')}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -287,7 +289,7 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
               </div>
 
               <button type="submit" className="btn btn-primary" style={{ height: '38px' }}>
-                <PlusIcon size={16} /> Add Item
+                <PlusIcon size={16} /> {t('Add Item')}
               </button>
             </form>
 
@@ -344,32 +346,32 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
         <div>
           <div className="card order-summary-card">
             <div className="card-header">
-              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Billing Summary</h3>
-              <span className="badge badge-primary">{items.length} Items</span>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>{t('Billing Summary')}</h3>
+              <span className="badge badge-primary">{items.length} {t('Items')}</span>
             </div>
 
             <div style={{ marginBottom: '1.25rem' }}>
               <div className="summary-row">
-                <span style={{ color: 'var(--text-muted)' }}>Item Subtotal:</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('Item Subtotal:')}</span>
                 <span style={{ fontWeight: 600 }}>₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="summary-row">
-                <span style={{ color: 'var(--text-muted)' }}>Discounts:</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('Discounts:')}</span>
                 <span>₹0.00</span>
               </div>
               <div className="summary-row">
-                <span style={{ color: 'var(--text-muted)' }}>GST (0%):</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('GST (0%):')}</span>
                 <span>₹0.00</span>
               </div>
               <div className="summary-row grand-total">
-                <span>Grand Total:</span>
+                <span>{t('Grand Total:')}</span>
                 <span>₹{totalAmount.toFixed(2)}</span>
               </div>
             </div>
 
             {/* Payment Method Selector */}
             <div className="form-group">
-              <label>Payment Method <span className="required">*</span></label>
+              <label>{t('Payment Method')} <span className="required">*</span></label>
               <div className="payment-method-selector">
                 {['UPI', 'Cash', 'Card', 'Other'].map(method => (
                   <button
@@ -389,7 +391,7 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
             </div>
 
             <div className="form-group">
-              <label>Invoice Notes / PO Number</label>
+              <label>{t('Invoice Notes / PO Number')}</label>
               <input
                 type="text"
                 className="form-control"
@@ -406,7 +408,7 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
               onClick={handleSaveSale}
               disabled={items.length === 0}
             >
-              <CheckIcon size={18} /> Confirm & Save Sale
+              <CheckIcon size={18} /> {t('Confirm & Save Sale')}
             </button>
           </div>
         </div>

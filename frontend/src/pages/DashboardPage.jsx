@@ -124,38 +124,38 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
       <div className="page-header" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <div className="editorial-kicker mb-1">
-            <span>●</span> Executive Intelligence Workspace
+            <span>●</span> {t('Executive Intelligence Workspace')}
           </div>
           <h1 className="page-title">
             {businessInfo?.name || businessInfo?.businessName || 'Lakshmi Enterprise'}
           </h1>
           <p className="page-subtitle">
-            {currentDateStr} • Real-time financial velocity, inventory stock intelligence & autonomous ML predictions
+            {currentDateStr} • {t('Real-time financial velocity, inventory stock intelligence & autonomous ML predictions')}
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <button className="btn btn-secondary" onClick={fetchDashboardData} title="Refresh Live Data">
-            <RefreshIcon size={15} /> Refresh
+          <button className="btn btn-secondary" onClick={fetchDashboardData} title={t('Refresh')}>
+            <RefreshIcon size={15} /> {t('Refresh')}
           </button>
           <button className="btn btn-primary" onClick={() => setActiveTab('sales')}>
-            <PlusIcon size={15} /> POS Counter
+            <PlusIcon size={15} /> {t('+ POS Counter')}
           </button>
         </div>
       </div>
 
       {/* 2. Distinctive AI Business Insight Component (Section 16) */}
       <AIInsight
-        title="AI BUSINESS INSIGHT"
+        title={t('AI BUSINESS INSIGHT')}
         insight={
           inventorySummary.lowStock > 0
             ? `${inventorySummary.lowStock} products are running below safety reorder threshold. Fast consumption velocity indicates risk of stockout within 5 days.`
-            : "Sales velocity is holding steady with positive net operating profit margins. High customer repeat rates observed across staples."
+            : t('Sales velocity is holding steady with positive net operating profit margins. High customer repeat rates observed across staples.')
         }
-        source="Generated autonomously from live store telemetry & consumption velocity"
-        primaryActionLabel="Review Recommendations"
+        source={t('Generated autonomously from live store telemetry & consumption velocity')}
+        primaryActionLabel={t('Review Recommendations')}
         onPrimaryAction={() => setActiveTab('inventory')}
-        secondaryActionLabel="Open AI Assistant"
+        secondaryActionLabel={t('Open AI Assistant')}
         onSecondaryAction={onOpenAiModal ? onOpenAiModal : undefined}
       />
 
@@ -167,7 +167,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           icon={CurrencyIcon}
           colorClass="green"
           trendValue="+14.2%"
-          subtext="Total Revenue"
+          subtext={t('Total Revenue')}
           trendDirection="up"
         />
         <StatCard
@@ -175,8 +175,8 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           value={`₹${financials.totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           icon={SalesIcon}
           colorClass="orange"
-          trendValue="Operating"
-          subtext="Overhead Costs"
+          trendValue={t('Operating')}
+          subtext={t('Operating Overhead Costs')}
           trendDirection="neutral"
         />
         <StatCard
@@ -184,8 +184,8 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           value={`₹${financials.netProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           icon={CurrencyIcon}
           colorClass={financials.netProfit >= 0 ? "green" : "red"}
-          trendValue={financials.netProfit >= 0 ? "Profitable" : "Deficit"}
-          subtext="Net Operating Margin"
+          trendValue={financials.netProfit >= 0 ? t('Profitable') : t('Deficit')}
+          subtext={t('Net Operating Margin')}
           trendDirection={financials.netProfit >= 0 ? "up" : "down"}
         />
         <StatCard
@@ -193,8 +193,8 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           value={stats.totalCustomers || 5}
           icon={CustomersIcon}
           colorClass="blue"
-          trendValue="+2 this week"
-          subtext="Active Khata Base"
+          trendValue={`+2 ${t('this week')}`}
+          subtext={t('Active Khata Base')}
           trendDirection="up"
         />
         <StatCard
@@ -202,8 +202,8 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           value={stats.totalProducts || 8}
           icon={ProductsIcon}
           colorClass="purple"
-          trendValue={`${inventorySummary.lowStock || 0} low stock`}
-          subtext="Catalog Items"
+          trendValue={`${inventorySummary.lowStock || 0} ${t('low stock')}`}
+          subtext={t('Catalog Items')}
           trendDirection="neutral"
         />
       </div>
@@ -219,9 +219,9 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <h4 style={{ margin: 0, color: 'var(--color-warning)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.88rem', fontWeight: 700 }}>
-              ⚠ Active Store Alerts ({alerts.length})
+              ⚠ {t('Active Store Alerts')} ({alerts.length})
             </h4>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Action Required</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{t('Action Required')}</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.75rem' }}>
@@ -237,10 +237,10 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
               }}>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: '0.85rem', color: alt.severity === 'CRITICAL' ? 'var(--color-danger)' : 'var(--color-warning)' }}>
-                    {alt.title}
+                    {t(alt.title)}
                   </div>
                   <div style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                    {alt.message}
+                    {t(alt.message)}
                   </div>
                 </div>
                 <button
@@ -254,7 +254,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
                     fontSize: '1rem',
                     padding: '4px'
                   }}
-                  title="Dismiss alert"
+                  title={t('Dismiss alert')}
                 >
                   ✓
                 </button>
@@ -270,14 +270,14 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div>
               <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}>
-                <span style={{ color: 'var(--color-accent-strong)' }}>✦</span> Autonomous Purchase Orders
+                <span style={{ color: 'var(--color-accent-strong)' }}>✦</span> {t('Autonomous Purchase Orders')}
               </h3>
               <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
-                Computed by adaptive time-series forecasting model based on 30-day velocity
+                {t('Computed by adaptive time-series forecasting model based on 30-day velocity')}
               </p>
             </div>
             <button className="btn btn-sm btn-secondary" onClick={() => setActiveTab('inventory')}>
-              Inventory Control →
+              {t('Inventory Control')} →
             </button>
           </div>
 
@@ -296,7 +296,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
                   </span>
                 </div>
                 <div style={{ fontSize: '0.82rem', color: 'var(--color-accent-strong)', marginTop: '0.4rem', fontWeight: 600 }}>
-                  Suggested Reorder: +{rec.recommendedQuantity} units (Est: ₹{(rec.estimatedCost || 0).toLocaleString()})
+                  {t('Suggested Reorder')}: +{rec.recommendedQuantity} {t('units')} (Est: ₹{(rec.estimatedCost || 0).toLocaleString()})
                 </div>
                 <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
                   {rec.reason}
@@ -310,8 +310,8 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
       {/* 6. Charts & Analytics Row (Revenue Velocity + Top Products) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
         <ChartCard
-          title="Revenue Trend Velocity"
-          subtitle="Real-time timeline analysis"
+          title={t('Revenue Trend Velocity')}
+          subtitle={t('Real-time timeline analysis')}
           data={chartData}
           filter={chartFilter}
           onFilterChange={setChartFilter}
@@ -322,15 +322,15 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
         <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
           <div className="card-header">
             <div>
-              <h3 className="card-title">Top Selling Products</h3>
-              <p className="card-subtitle">Ranked by volume & gross yield</p>
+              <h3 className="card-title">{t('Top Selling Products')}</h3>
+              <p className="card-subtitle">{t('Ranked by volume & gross yield')}</p>
             </div>
           </div>
 
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.85rem', justifyContent: 'center' }}>
             {topProducts.length === 0 ? (
               <div style={{ color: 'var(--color-text-muted)', fontSize: '0.84rem', textAlign: 'center', padding: '2rem 0' }}>
-                No product transactions recorded yet
+                {t('No product transactions recorded yet')}
               </div>
             ) : (
               topProducts.map((p, idx) => {
@@ -341,7 +341,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '0.35rem' }}>
                       <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{p.productName}</span>
                       <span style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                        {p.totalQuantitySold} units (₹{Number(p.totalRevenue || 0).toLocaleString()})
+                        {p.totalQuantitySold} {t('units')} (₹{Number(p.totalRevenue || 0).toLocaleString()})
                       </span>
                     </div>
                     <div style={{ height: '6px', background: 'var(--color-surface-raised)', borderRadius: '4px', overflow: 'hidden' }}>

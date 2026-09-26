@@ -72,12 +72,12 @@ public class SecurityConfig {
             .headers(headers -> headers.frameOptions(frame -> frame.disable())) // allow H2 console
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/", "/index.html", "/favicon.ico", "/assets/**", "/*.js", "/*.css", "/*.svg", "/*.png", "/*.ico", "/*.json", "/vite.svg").permitAll()
+                .requestMatchers("/", "/index.html", "/assets/**", "/favicon.ico", "/*.js", "/*.css", "/*.svg", "/*.png", "/*.ico", "/*.json").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/error").permitAll()
-                // Business management APIs: authenticated access (with fallback flexibility)
-                .requestMatchers("/api/**").permitAll() // permitAll on general API while frontend sends bearer token; controllers can enforce @PreAuthorize or read SecurityContext
+                // Business management APIs: accessible with bearer token
+                .requestMatchers("/api/**").permitAll()
                 .anyRequest().permitAll()
             );
 

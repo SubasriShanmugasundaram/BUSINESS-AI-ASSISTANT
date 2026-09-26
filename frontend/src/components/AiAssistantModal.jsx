@@ -5,17 +5,43 @@ import { useVoiceAssistant } from '../hooks/useVoiceAssistant';
 import { BotIcon, MicIcon } from './Icons';
 
 export default function AiAssistantModal({ isOpen, onClose }) {
-  const { currentLanguage, languages, setCurrentLanguage } = useLanguage();
+  const { currentLanguage, languages, setCurrentLanguage, t } = useLanguage();
   const { isListening, isSpeaking, transcript, hasVoiceSupport, startListening, stopListening, speak, stopSpeaking } = useVoiceAssistant(currentLanguage);
 
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      sender: 'ai',
-      type: 'insight',
+  const [showApiKeys, setShowApiKeys] = useState(false);
+  const [geminiKeyInput, setGeminiKeyInput] = useState(() => localStorage.getItem('gemini_api_key') || '');
+  const [cartesiaKeyInput, setCartesiaKeyInput] = useState(() => localStorage.getItem('cartesia_api_key') || '');
+  const [keysSaved, setKeysSaved] = useState(false);
+
+  const getWelcomeMessage = (lang) => {
+    if (lang === 'ta') {
+      return {
+        text: "வணக்கம்! நான் உங்கள் BizPartner AI வணிக நுண்ணறிவு கூட்டாளி. உங்கள் கடையின் நேரலை விற்பனை வேகம், சரக்கு இருப்பு மற்றும் இயக்க லாப வரம்புகளை நான் நேரடியாகக் கண்காணிக்கிறேன். இன்று உங்கள் வணிகத்திற்கு நான் எவ்வாறு உதவலாம்?",
+        actions: [
+          "எந்த பொருட்களை நான் வாங்க வேண்டும்?",
+          "எந்த பொருள் அதிகமாக விற்கிறது?",
+          "மெதுவாக விற்கும் பொருட்கள் எவை?",
+          "தற்போதைய கையிருப்பு நிலை என்ன?",
+          "இந்த மாத விற்பனை எப்படி இருந்தது?"
+        ]
+      };
+    }
+    if (lang === 'hi') {
+      return {
+        text: "नमस्ते! मैं आपका BizPartner AI बिजनेस पार्टनर हूँ। मेरे पास आपकी बिक्री गति, इन्वेंट्री स्टॉक और लाभ मार्जिन की लाइव जानकारी है। आज मैं आपकी क्या मदद कर सकता हूँ?",
+        actions: [
+          "मुझे कौन से उत्पाद खरीदने चाहिए?",
+          "सबसे ज्यादा कौन सा उत्पाद बिकता है?",
+          "धीमी गति से बिकने वाले उत्पाद कौन से हैं?",
+          "वर्तमान स्टॉक स्थिति क्या है?",
+          "इस महीने बिक्री कैसी रही?"
+        ]
+      };
+    }
+    return {
       text: "Hello! I am BizPartner AI, your business intelligence partner. I have direct visibility into your live sales velocity, inventory stock levels, and operating margins. How can I assist your business today?",
-      context: "Verified Business Database Engine",
       actions: [
         "Which products should I purchase?",
         "Which product sells the most?",
@@ -23,8 +49,66 @@ export default function AiAssistantModal({ isOpen, onClose }) {
         "What is my current stock?",
         "How was my sales performance this month?"
       ]
+    };
+  };
+
+  const [messages, setMessages] = useState(() => {
+    const welcome = getWelcomeMessage(currentLanguage);
+    return [{
+      sender: 'ai',
+      type: 'insight',
+      text: welcome.text,
+      context: localStorage.getItem('gemini_api_key') ? "Google Gemini 1.5 Flash (Live Database)" : "Direct Store Intelligence Engine",
+      actions: welcome.actions
+    }];
+  });
+
+  const [testingVoice, setTestingVoice] = useState(false);
+
+  useEffect(() => {
+    setMessages(prev => {
+      if (prev.length <= 1) {
+        const welcome = getWelcomeMessage(currentLanguage);
+        return [{
+          sender: 'ai',
+          type: 'insight',
+          text: welcome.text,
+          context: localStorage.getItem('gemini_api_key') ? "Google Gemini 1.5 Flash (Live Database)" : "Direct Store Intelligence Engine",
+          actions: welcome.actions
+        }];
+      }
+      return prev;
+    });
+  }, [currentLanguage]);
+
+  const handleTestVoice = async () => {
+    setTestingVoice(true);
+    const sampleText = currentLanguage === 'ta' 
+      ? 'வணக்கம்! கார்ட்டீசியா நரம்பியல் குரல் அமைப்பு வெற்றிகரமாக இணைக்கப்பட்டுள்ளது.' 
+      : currentLanguage === 'hi' 
+      ? 'नमस्ते! कार्टेशिया न्यूरल वॉयस सिस्टम सफलतापूर्वक जुड़ा हुआ है।' 
+      : 'Hello! Cartesia neural voice synthesis is active and connected.';
+    await speak(sampleText);
+    setTestingVoice(false);
+  };
+
+  const handleSaveKeys = () => {
+    if (geminiKeyInput.trim()) {
+      localStorage.setItem('gemini_api_key', geminiKeyInput.trim());
+    } else {
+      localStorage.removeItem('gemini_api_key');
     }
-  ]);
+    if (cartesiaKeyInput.trim()) {
+      localStorage.setItem('cartesia_api_key', cartesiaKeyInput.trim());
+    } else {
+      localStorage.removeItem('cartesia_api_key');
+    }
+    setKeysSaved(true);
+    setTimeout(() => {
+      setKeysSaved(false);
+      setShowApiKeys(false);
+    }, 1500);
+  };
 
   const messagesEndRef = useRef(null);
 
@@ -144,7 +228,24 @@ export default function AiAssistantModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <button
+              type="button"
+              onClick={() => setShowApiKeys(p => !p)}
+              className="btn btn-sm btn-secondary"
+              style={{
+                fontSize: '0.72rem',
+                padding: '4px 8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                border: showApiKeys ? '1px solid var(--color-accent)' : undefined
+              }}
+              title="Configure Gemini & Cartesia API Keys"
+            >
+              ⚙️ {localStorage.getItem('gemini_api_key') ? 'Gemini Active' : 'Setup AI Keys'}
+            </button>
+
             {/* Language Selector in Header */}
             {languages && languages.length > 0 && (
               <select
@@ -162,7 +263,7 @@ export default function AiAssistantModal({ isOpen, onClose }) {
               >
                 {languages.map(l => (
                   <option key={l.code} value={l.code}>
-                    {l.native} ({l.name})
+                    {l.nativeName || l.name} ({l.name})
                   </option>
                 ))}
               </select>
@@ -186,6 +287,93 @@ export default function AiAssistantModal({ isOpen, onClose }) {
             </button>
           </div>
         </div>
+
+        {/* Collapsible Gemini & Cartesia Key Configuration */}
+        {showApiKeys && (
+          <div style={{
+            background: 'var(--color-surface)',
+            borderBottom: '1px solid var(--color-border)',
+            padding: '1rem 1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--color-text-primary)' }}>
+                ✦ Connect Google Gemini & Cartesia Voice AI
+              </span>
+              {keysSaved && (
+                <span style={{ fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 600 }}>
+                  ✓ Keys Saved Successfully!
+                </span>
+              )}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem' }}>
+              <div>
+                <label style={{ fontSize: '0.74rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                  Google Gemini API Key
+                </label>
+                <input
+                  type="password"
+                  value={geminiKeyInput}
+                  onChange={e => setGeminiKeyInput(e.target.value)}
+                  placeholder="Paste Gemini API key (AIzaSy...)"
+                  className="form-control"
+                  style={{ fontSize: '0.75rem', padding: '6px 8px' }}
+                />
+                <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', display: 'block', marginTop: '2px' }}>
+                  Real Generative AI reasoning with full live store context.
+                </span>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.74rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                  Cartesia Voice API Key (Sonic TTS)
+                </label>
+                <input
+                  type="password"
+                  value={cartesiaKeyInput}
+                  onChange={e => setCartesiaKeyInput(e.target.value)}
+                  placeholder="Paste Cartesia Voice key"
+                  className="form-control"
+                  style={{ fontSize: '0.75rem', padding: '6px 8px' }}
+                />
+                <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', display: 'block', marginTop: '2px' }}>
+                  Ultra-realistic neural speech synthesis via Cartesia Sonic.
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
+              <button
+                type="button"
+                className="btn btn-sm btn-secondary"
+                onClick={handleTestVoice}
+                disabled={testingVoice}
+                style={{ fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+              >
+                {testingVoice ? '🔊 Playing Voice...' : '🎙️ Test Voice Output'}
+              </button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-secondary"
+                  onClick={() => setShowApiKeys(false)}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-primary"
+                  onClick={handleSaveKeys}
+                >
+                  Save & Connect
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Message Log */}
         <div style={{
@@ -261,19 +449,23 @@ export default function AiAssistantModal({ isOpen, onClose }) {
                       {speak && (
                         <button
                           type="button"
-                          onClick={() => speak(m.text)}
-                          title="Read aloud"
+                          onClick={() => isSpeaking ? stopSpeaking() : speak(m.text)}
+                          title="Read aloud with Neural Voice"
                           style={{
-                            background: 'none',
-                            border: 'none',
+                            background: isSpeaking ? 'var(--color-danger)' : 'var(--color-surface)',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '4px',
                             cursor: 'pointer',
-                            fontSize: '0.75rem',
-                            padding: '2px 6px',
-                            color: 'var(--color-accent-strong)',
-                            fontWeight: 600
+                            fontSize: '0.72rem',
+                            padding: '3px 8px',
+                            color: isSpeaking ? '#ffffff' : 'var(--color-accent-strong)',
+                            fontWeight: 600,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
                           }}
                         >
-                          🔊 Read
+                          {isSpeaking ? '⏹ Stop' : localStorage.getItem('cartesia_api_key') ? '🎙️ Cartesia Voice' : '🔊 Listen'}
                         </button>
                       )}
                     </div>

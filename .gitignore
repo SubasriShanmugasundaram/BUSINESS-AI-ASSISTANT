@@ -1,41 +1,18 @@
-# OS files
-.DS_Store
-Thumbs.db
+# Dependencies
+node_modules/
+backend-tools/
 
-# Editor / IDE
+# Build outputs
+**/target/
+**/dist/
+**/build/
+
+# Environment secrets
+.env
+.env.local
+
+# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# Node / frontend
-frontend/node_modules/
-frontend/dist/
-frontend/.vite/
-frontend/coverage/
-
-# Python / ML service
-ml-service/.venv/
-ml-service/venv/
-ml-service/__pycache__/
-ml-service/**/*.py[cod]
-ml-service/.pytest_cache/
-ml-service/.mypy_cache/
-
-# Java / Maven / build
-backend/target/
-backend/.classpath
-backend/.project
-backend/.settings/
-
-# Environment files
-.env
-.env.*
-!.env.example
-
-# Logs
+*.iml
 *.log
-
-# Temporary files
-*.tmp
-*.bak

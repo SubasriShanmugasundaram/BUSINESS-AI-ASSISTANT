@@ -1,5 +1,6 @@
 import React from 'react';
 import { BotIcon } from './Icons';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AIInsight({
   title = "AI BUSINESS INSIGHT",
@@ -10,18 +11,19 @@ export default function AIInsight({
   secondaryActionLabel = "Purchase recommendation",
   onSecondaryAction
 }) {
+  const { t } = useLanguage();
   return (
     <section className="ai-insight-banner" aria-label="AI Business Intelligence Insight">
       <div className="ai-insight-header">
         <div className="ai-insight-tag">
           <BotIcon size={16} />
-          <span>{title}</span>
+          <span>{t(title)}</span>
         </div>
-        <span className="ai-insight-source">{source}</span>
+        <span className="ai-insight-source">{t(source)}</span>
       </div>
 
       <div className="ai-insight-text">
-        “{insight}”
+        “{t(insight)}”
       </div>
 
       <div className="ai-insight-actions">
@@ -31,7 +33,7 @@ export default function AIInsight({
             className="btn btn-sm btn-primary"
             onClick={onPrimaryAction}
           >
-            <span>{primaryActionLabel}</span>
+            <span>{t(primaryActionLabel)}</span>
             <span aria-hidden="true">→</span>
           </button>
         )}
@@ -42,7 +44,7 @@ export default function AIInsight({
             className="btn btn-sm btn-secondary"
             onClick={onSecondaryAction}
           >
-            <span>{secondaryActionLabel}</span>
+            <span>{t(secondaryActionLabel)}</span>
             <span aria-hidden="true">→</span>
           </button>
         )}

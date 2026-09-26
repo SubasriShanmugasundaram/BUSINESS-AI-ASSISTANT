@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE } from '../i18n/languages';
 import enTranslations from '../i18n/en.json';
+import { TRANSLATIONS } from '../i18n/translations';
 
 const LanguageContext = createContext();
 
@@ -150,30 +151,54 @@ export function LanguageProvider({ children }) {
     document.documentElement.dir = langMeta.dir || 'ltr';
   }, [currentLanguage, langMeta]);
 
-  const t = (key) => {
-    // 1. Check regional dictionary
+  const t = (key, fallback) => {
+    if (!key) return '';
+    // 1. Check comprehensive TRANSLATIONS catalog for the current language
+    if (TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][key]) {
+      return TRANSLATIONS[currentLanguage][key];
+    }
+    // 2. Check REGIONAL_TERMS
     if (REGIONAL_TERMS[currentLanguage] && REGIONAL_TERMS[currentLanguage][key]) {
       return REGIONAL_TERMS[currentLanguage][key];
     }
-    // 2. Check english JSON dictionary
-    const keys = key.split('.');
-    let val = enTranslations;
-    for (const k of keys) {
-      if (val && typeof val === 'object' && k in val) {
-        val = val[k];
-      } else {
-        return key;
+    // 3. Check if key is a dot-separated path in enTranslations
+    if (typeof key === 'string' && key.includes('.')) {
+      const keys = key.split('.');
+      let val = enTranslations;
+      for (const k of keys) {
+        if (val && typeof val === 'object' && k in val) {
+          val = val[k];
+        } else {
+          val = null;
+          break;
+        }
+      }
+      if (val && typeof val === 'string') {
+        if (TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][val]) {
+          return TRANSLATIONS[currentLanguage][val];
+        }
+        return val;
       }
     }
-    return val || key;
+    // 4. If fallback provided and has a translation
+    if (fallback && TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][fallback]) {
+      return TRANSLATIONS[currentLanguage][fallback];
+    }
+    return fallback !== undefined ? fallback : key;
+  };
+
+  const changeLanguage = (code) => {
+    setCurrentLanguage(code);
   };
 
   return (
     <LanguageContext.Provider value={{
       currentLanguage,
       setCurrentLanguage,
+      changeLanguage,
       langMeta,
       languages: SUPPORTED_LANGUAGES,
+      availableLanguages: SUPPORTED_LANGUAGES,
       t
     }}>
       {children}

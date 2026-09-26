@@ -7,7 +7,7 @@ import { api } from '../services/api';
 export default function TopBar({ businessName, onSearch, setMobileOpen, onOpenProfile, onOpenAi }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [alerts, setAlerts] = useState([]);
-  const { currentLanguage, changeLanguage, availableLanguages } = useLanguage();
+  const { currentLanguage, changeLanguage, availableLanguages, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function TopBar({ businessName, onSearch, setMobileOpen, onOpenPr
             {businessName || 'Lakshmi Enterprise'}
           </h2>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Digital Business Partner
+            {t('Digital Business Partner')}
           </span>
         </div>
       </div>
@@ -54,7 +54,7 @@ export default function TopBar({ businessName, onSearch, setMobileOpen, onOpenPr
         <SearchIcon size={16} />
         <input
           type="text"
-          placeholder="Quick search across records..."
+          placeholder={t('Quick search across records...')}
           onChange={(e) => onSearch && onSearch(e.target.value)}
         />
       </div>
@@ -78,7 +78,7 @@ export default function TopBar({ businessName, onSearch, setMobileOpen, onOpenPr
           >
             {availableLanguages.map(l => (
               <option key={l.code} value={l.code}>
-                {l.native} ({l.name})
+                {l.nativeName || l.name} ({l.name})
               </option>
             ))}
           </select>
@@ -98,10 +98,10 @@ export default function TopBar({ businessName, onSearch, setMobileOpen, onOpenPr
           className="btn btn-sm btn-primary"
           onClick={onOpenAi}
           style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.75rem' }}
-          title="Open AI Business Assistant"
+          title={t('AI Assistant')}
         >
           <BotIcon size={16} />
-          <span>AI Assist</span>
+          <span>{t('AI Assist')}</span>
         </button>
 
         {/* Alerts & Notifications */}
@@ -109,7 +109,7 @@ export default function TopBar({ businessName, onSearch, setMobileOpen, onOpenPr
           <button
             className="topbar-icon-btn"
             onClick={() => setShowNotifications(prev => !prev)}
-            title="Business Alerts"
+            title={t('Business Alerts')}
           >
             <BellIcon size={20} />
             {unreadAlerts.length > 0 && <span className="topbar-badge-dot" />}
@@ -131,8 +131,8 @@ export default function TopBar({ businessName, onSearch, setMobileOpen, onOpenPr
               }}
             >
               <div style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
-                <span>Business Alerts</span>
-                <span className="badge badge-primary">{alerts.length} Active</span>
+                <span>{t('Business Alerts')}</span>
+                <span className="badge badge-primary">{alerts.length} {t('Active')}</span>
               </div>
               <div style={{ maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {alerts.map(alert => (
@@ -146,13 +146,13 @@ export default function TopBar({ businessName, onSearch, setMobileOpen, onOpenPr
                     }}
                   >
                     <div style={{ fontWeight: 600, display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-                      <span>{alert.title}</span>
+                      <span>{t(alert.title)}</span>
                       <span className={`badge ${alert.severity === 'CRITICAL' ? 'badge-danger' : alert.severity === 'WARNING' ? 'badge-warning' : 'badge-primary'}`}>
                         {alert.severity}
                       </span>
                     </div>
                     <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                      {alert.message}
+                      {t(alert.message)}
                     </div>
                   </div>
                 ))}
@@ -167,8 +167,8 @@ export default function TopBar({ businessName, onSearch, setMobileOpen, onOpenPr
             <UserIcon size={18} />
           </div>
           <div className="profile-info">
-            <span className="profile-name">Owner Portal</span>
-            <span className="profile-role">MSME Administrator</span>
+            <span className="profile-name">{t('Owner Portal')}</span>
+            <span className="profile-role">{t('MSME Administrator')}</span>
           </div>
         </div>
       </div>

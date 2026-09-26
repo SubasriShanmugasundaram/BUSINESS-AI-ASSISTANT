@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ChartCard({
   title,
@@ -10,6 +11,7 @@ export default function ChartCard({
   filterOptions = ['Today', 'This Week', 'This Month'],
   height = 240
 }) {
+  const { t } = useLanguage();
   const [hoverIndex, setHoverIndex] = useState(null);
 
   const maxValue = data.length > 0 ? Math.max(...data.map(d => d.value), 100) : 1000;
@@ -65,7 +67,7 @@ export default function ChartCard({
                 }}
                 onClick={() => onFilterChange(opt)}
               >
-                {opt}
+                {t(opt)}
               </button>
             ))}
           </div>

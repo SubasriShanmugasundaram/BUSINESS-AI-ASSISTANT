@@ -14,7 +14,10 @@ import {
   GstIcon
 } from './Icons';
 
+import { useLanguage } from '../context/LanguageContext';
+
 export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobileOpen, onLogout, onOpenAi }) {
+  const { t } = useLanguage();
   const navItems = [
     { id: 'dashboard', label: 'Overview', icon: DashboardIcon },
     { id: 'history', label: 'Sales', icon: HistoryIcon },
@@ -43,12 +46,12 @@ export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobile
           <div className="sidebar-logo">AI</div>
           <div>
             <div className="sidebar-brand-title">BizPartner AI</div>
-            <div className="sidebar-brand-subtitle">Business Intelligence</div>
+            <div className="sidebar-brand-subtitle">{t('Business Intelligence')}</div>
           </div>
         </div>
 
         <nav className="sidebar-nav">
-          <div className="nav-section-label">Operations & Data</div>
+          <div className="nav-section-label">{t('Operations & Data')}</div>
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -60,12 +63,12 @@ export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobile
                 onClick={() => handleNavClick(item.id)}
               >
                 <Icon size={17} />
-                <span>{item.label}</span>
+                <span>{t(item.label)}</span>
               </button>
             );
           })}
 
-          <div className="nav-section-label" style={{ marginTop: '0.75rem' }}>AI Intelligence</div>
+          <div className="nav-section-label" style={{ marginTop: '0.75rem' }}>{t('AI Intelligence')}</div>
           <button
             className="nav-item"
             onClick={onOpenAi}
@@ -76,7 +79,7 @@ export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobile
             }}
           >
             <BotIcon size={17} />
-            <span>AI Assistant</span>
+            <span>{t('AI Assistant')}</span>
           </button>
         </nav>
 
@@ -91,19 +94,24 @@ export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobile
               justifyContent: 'center',
               gap: '0.5rem',
               padding: '0.65rem 0.75rem',
-              fontSize: '0.84rem'
+              fontSize: '0.82rem',
+              whiteSpace: 'normal',
+              lineHeight: 1.25,
+              wordBreak: 'break-word',
+              textAlign: 'center',
+              boxShadow: 'var(--shadow-sm)'
             }}
             onClick={onOpenAi}
           >
             <BotIcon size={17} />
-            <span>Ask Business Partner</span>
+            <span>{t('Ask Business Partner')}</span>
           </button>
         </div>
 
         <div className="sidebar-footer">
           <div className="sidebar-module-badge" style={{ marginBottom: '0.75rem' }}>
             <span className="dot" />
-            <span>Live Data Sync</span>
+            <span>{t('Live Data Sync')}</span>
           </div>
           <button
             className="nav-item"
@@ -111,7 +119,7 @@ export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobile
             onClick={onLogout}
           >
             <LogOutIcon size={17} />
-            <span>Sign Out</span>
+            <span>{t('Sign Out')}</span>
           </button>
         </div>
       </aside>
