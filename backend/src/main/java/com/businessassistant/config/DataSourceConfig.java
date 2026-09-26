@@ -47,6 +47,9 @@ public class DataSourceConfig {
                     String[] parts = userInfo.split(":", 2);
                     username = java.net.URLDecoder.decode(parts[0], java.nio.charset.StandardCharsets.UTF_8.name());
                     password = java.net.URLDecoder.decode(parts[1], java.nio.charset.StandardCharsets.UTF_8.name());
+                    if (password.startsWith("[") && password.endsWith("]")) {
+                        password = password.substring(1, password.length() - 1);
+                    }
                 } else if (userInfo != null) {
                     username = java.net.URLDecoder.decode(userInfo, java.nio.charset.StandardCharsets.UTF_8.name());
                 }
