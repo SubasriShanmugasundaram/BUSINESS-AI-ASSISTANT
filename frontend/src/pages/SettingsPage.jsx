@@ -19,6 +19,7 @@ export default function SettingsPage({ businessInfo, setBusinessInfo, showToast 
     address: businessInfo?.address || '102 Market Road, Bengaluru - 560001'
   });
 
+  const [saving, setSaving] = useState(false);
   const [geminiKey, setGeminiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
   const [cartesiaKey, setCartesiaKey] = useState(() => localStorage.getItem('cartesia_api_key') || '');
   const [cartesiaVoiceId, setCartesiaVoiceId] = useState(() => localStorage.getItem('cartesia_voice_id') || 'a0e99841-438c-4a64-b679-ae501e7d6091');

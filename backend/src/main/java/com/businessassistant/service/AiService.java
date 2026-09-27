@@ -35,6 +35,7 @@ public class AiService {
     private final SaleRepository saleRepository;
     private final ExpenseRepository expenseRepository;
     private final BusinessProfileRepository businessProfileRepository;
+    private final ReportService reportService;
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient;
 
@@ -43,12 +44,14 @@ public class AiService {
                      SaleRepository saleRepository,
                      ExpenseRepository expenseRepository,
                      BusinessProfileRepository businessProfileRepository,
+                     ReportService reportService,
                      ObjectMapper objectMapper) {
         this.productRepository = productRepository;
         this.inventoryRepository = inventoryRepository;
         this.saleRepository = saleRepository;
         this.expenseRepository = expenseRepository;
         this.businessProfileRepository = businessProfileRepository;
+        this.reportService = reportService;
         this.objectMapper = objectMapper;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(5))
@@ -146,6 +149,28 @@ public class AiService {
                         Collectors.reducing(BigDecimal.ZERO, Expense::getAmount, BigDecimal::add)
                 ));
         sb.append("Expenses by Category: ").append(expensesByCategory).append("\n");
+
+        // Rich Sales & Day/Week/Month Analytics
+        try {
+            com.businessassistant.dto.SalesReportDTO report = reportService.getSalesReportSummary("All Time");
+            sb.append("\nSALES ANALYTICS & PATTERNS:\n");
+            sb.append("- Best Selling Day of Week: ").append(report.getBestSellingDay())
+                    .append(" (₹").append(report.getBestSellingDayRevenue()).append(")\n");
+            sb.append("- Best Selling Week: ").append(report.getBestSellingWeek())
+                    .append(" (₹").append(report.getBestSellingWeekRevenue()).append(")\n");
+            sb.append("- Best Selling Month: ").append(report.getBestSellingMonth())
+                    .append(" (₹").append(report.getBestSellingMonthRevenue()).append(")\n");
+            sb.append("- Period Growth Rate: ").append(report.getGrowthPercentage()).append("%\n");
+            
+            if (report.getSlowProducts() != null && !report.getSlowProducts().isEmpty()) {
+                sb.append("- Slow Selling Products: ").append(
+                        report.getSlowProducts().stream().map(p -> p.getProductName() + " (" + p.getQuantitySold() + " sold)")
+                                .collect(Collectors.joining(", "))
+                ).append("\n");
+            }
+        } catch (Exception e) {
+            logger.warn("Could not append sales report summary to AI context: {}", e.getMessage());
+        }
 
         return sb.toString();
     }
@@ -256,6 +281,27 @@ public class AiService {
 
         boolean isProductQuery = q.contains("sell") || q.contains("product") || q.contains("fast") || q.contains("slow") || q.contains("top") ||
                 q.contains("பொருள்") || q.contains("அதிகமாக") || q.contains("उत्पाद") || q.contains("ज्यादा") || q.contains("बिक");
+
+        boolean isTimeframeQuery = q.contains("day") || q.contains("week") || q.contains("month") || q.contains("best selling") ||
+                q.contains("highest sales") || q.contains("நாள்கள்") || q.contains("மாதம்") || q.contains("வாரம்") ||
+                q.contains("दिन") || q.contains("हफ्ता") || q.contains("महीना");
+
+        // 0. Best Selling Day / Week / Month query (Features 10, 11, 12, 13)
+        if (isTimeframeQuery && (q.contains("highest") || q.contains("best") || q.contains("which") || q.contains("compare") || q.contains("எந்த") || q.contains("कौन"))) {
+            com.businessassistant.dto.SalesReportDTO report = reportService.getSalesReportSummary("All Time");
+            return String.format(
+                    "📅 **Sales Performance by Time Horizon:**\n\n" +
+                    "• 🏆 **Best Selling Day of Week:** %s (₹%s)\n" +
+                    "• 📅 **Best Selling Week:** %s (₹%s)\n" +
+                    "• 📊 **Best Selling Month:** %s (₹%s)\n" +
+                    "• 📈 **Period Growth Velocity:** %s%%\n\n" +
+                    "💡 *You can explore full day-by-day charts and period comparisons under Reports & Analytics.*",
+                    report.getBestSellingDay(), report.getBestSellingDayRevenue(),
+                    report.getBestSellingWeek(), report.getBestSellingWeekRevenue(),
+                    report.getBestSellingMonth(), report.getBestSellingMonthRevenue(),
+                    report.getGrowthPercentage()
+            );
+        }
 
         // 1. Stockout / Low stock inquiry
         if (isStockQuery) {

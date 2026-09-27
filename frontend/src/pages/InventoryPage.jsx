@@ -101,13 +101,17 @@ export default function InventoryPage({ showToast }) {
 
   const filteredInventory = inventoryList.filter(item => {
     const q = search.toLowerCase();
+    const sku = item.productSku || item.sku || '';
+    const name = item.productName || '';
+    const cat = item.category || '';
     const matchesSearch =
-      (item.productName && item.productName.toLowerCase().includes(q)) ||
-      (item.sku && item.sku.toLowerCase().includes(q)) ||
-      (item.category && item.category.toLowerCase().includes(q));
+      name.toLowerCase().includes(q) ||
+      sku.toLowerCase().includes(q) ||
+      cat.toLowerCase().includes(q);
 
+    const status = item.stockStatus || item.status || 'IN_STOCK';
     const matchesStatus =
-      statusFilter === 'ALL' || item.status === statusFilter;
+      statusFilter === 'ALL' || status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -237,14 +241,16 @@ export default function InventoryPage({ showToast }) {
                     filteredInventory.map((item) => {
                       const cost = Number(item.purchasePrice || 0);
                       const current = Number(item.currentStock || 0);
-                      const val = Number(item.totalValue || cost * current);
-                      const isLow = item.status === 'LOW_STOCK';
-                      const isOut = item.status === 'OUT_OF_STOCK';
+                      const val = Number(item.inventoryValue || item.totalValue || (cost * current));
+                      const status = item.stockStatus || item.status || 'IN_STOCK';
+                      const isLow = status === 'LOW_STOCK';
+                      const isOut = status === 'OUT_OF_STOCK';
+                      const sku = item.productSku || item.sku || `PRD-${String(item.productId || item.id || 0).padStart(4, '0')}`;
 
                       return (
                         <tr key={item.id || item.productId}>
                           <td style={{ fontWeight: 600, color: 'var(--text-subtle)' }}>
-                            {item.sku || `PRD-${String(item.productId).padStart(4, '0')}`}
+                            {sku}
                           </td>
                           <td>
                             <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
@@ -278,7 +284,7 @@ export default function InventoryPage({ showToast }) {
                                   : 'badge-success'
                               }`}
                             >
-                              {item.status.replace('_', ' ')}
+                              {String(status).replace('_', ' ')}
                             </span>
                           </td>
                           <td style={{ textAlign: 'right', fontWeight: 600 }}>
