@@ -21,13 +21,13 @@ export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobile
   const navItems = [
     { id: 'dashboard', label: 'Overview', icon: DashboardIcon },
     { id: 'history', label: 'Sales', icon: HistoryIcon },
-    { id: 'sales', label: 'POS Counter', icon: SalesIcon },
+    { id: 'sales', label: 'Billing Counter', icon: SalesIcon },
     { id: 'products', label: 'Products', icon: ProductsIcon },
     { id: 'inventory', label: 'Inventory', icon: InventoryIcon },
     { id: 'customers', label: 'Customers', icon: CustomersIcon },
     { id: 'expenses', label: 'Expenses', icon: ExpenseIcon },
     { id: 'reports', label: 'Reports', icon: ReportsIcon },
-    { id: 'gst', label: 'GST Compliance', icon: GstIcon },
+    { id: 'gst', label: 'GST Invoice', icon: GstIcon },
     { id: 'settings', label: 'Settings', icon: SettingsIcon },
   ];
 
@@ -45,7 +45,7 @@ export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobile
         <div className="sidebar-header">
           <div className="sidebar-logo">AI</div>
           <div>
-            <div className="sidebar-brand-title">BizPartner AI</div>
+            <div className="sidebar-brand-title">ProfitPilot AI</div>
             <div className="sidebar-brand-subtitle">{t('Business Intelligence')}</div>
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobile
             onClick={onOpenAi}
           >
             <BotIcon size={17} />
-            <span>{t('Ask Business Partner')}</span>
+            <span>{t('Ask ProfitPilot AI')}</span>
           </button>
         </div>
 

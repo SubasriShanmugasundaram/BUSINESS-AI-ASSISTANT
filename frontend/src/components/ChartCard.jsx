@@ -14,7 +14,7 @@ export default function ChartCard({
   const { t } = useLanguage();
   const [hoverIndex, setHoverIndex] = useState(null);
 
-  const maxValue = data.length > 0 ? Math.max(...data.map(d => d.value), 100) : 1000;
+  const maxValue = data.length > 0 ? Math.max(...data.map(d => Number(d.value) || 0), 100) : 1000;
   const padding = { top: 25, right: 20, bottom: 35, left: 60 };
   const width = 600; // viewBox coordinate space
 
@@ -24,9 +24,10 @@ export default function ChartCard({
 
   // Compute points
   const points = data.map((d, idx) => {
+    const val = Number(d.value) || 0;
     const x = padding.left + (data.length > 1 ? (idx / (data.length - 1)) * chartW : chartW / 2);
-    const y = padding.top + chartH - (d.value / maxValue) * chartH;
-    return { x, y, ...d };
+    const y = padding.top + chartH - (val / (maxValue || 1)) * chartH;
+    return { x, y, ...d, value: val };
   });
 
   const pathD = points.length > 1
@@ -41,8 +42,8 @@ export default function ChartCard({
     <div className="card">
       <div className="card-header">
         <div>
-          <h3 className="card-title">{title}</h3>
-          {subtitle && <p className="card-subtitle">{subtitle}</p>}
+          <h3 className="card-title">{t(title)}</h3>
+          {subtitle && <p className="card-subtitle">{t(subtitle)}</p>}
         </div>
 
         {filterOptions && onFilterChange && (
@@ -157,7 +158,7 @@ export default function ChartCard({
                     fontWeight="500"
                     fontFamily="var(--font-body)"
                   >
-                    {pt.label}
+                    {t(pt.label)}
                   </text>
                 </g>
               ))}
@@ -196,7 +197,7 @@ export default function ChartCard({
                       fill="var(--color-text-secondary)"
                       fontFamily="var(--font-body)"
                     >
-                      {pt.label}
+                      {t(pt.label)}
                     </text>
                   </g>
                 );
@@ -214,7 +215,7 @@ export default function ChartCard({
             padding: '4px',
             fontFamily: 'var(--font-mono)'
           }}>
-            <strong>{points[hoverIndex].label}:</strong> ₹{points[hoverIndex].value?.toLocaleString()}
+            <strong>{t(points[hoverIndex].label)}:</strong> ₹{points[hoverIndex].value?.toLocaleString()}
           </div>
         )}
       </div>

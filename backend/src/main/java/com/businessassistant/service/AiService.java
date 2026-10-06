@@ -176,9 +176,7 @@ public class AiService {
     }
 
     private String callGemini(String userQuery, String businessContext, String language, String apiKey) throws Exception {
-        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
-
-        String systemInstruction = "You are BizPartner AI, a friendly and highly knowledgeable business partner assisting an Indian MSME / retail business owner.\n" +
+        String systemInstruction = "You are ProfitPilot AI, a friendly and highly knowledgeable business partner assisting an Indian MSME / retail business owner.\n" +
                 "You must strictly use the provided live business data below to answer accurately with real numbers.\n" +
                 "Do NOT fabricate sales or inventory values. If information is not in the data, state clearly that it is not available.\n" +
                 "Language requirement: You MUST reply in the requested language: " + language + ".\n\n" +
@@ -198,23 +196,31 @@ public class AiService {
 
         String jsonPayload = objectMapper.writeValueAsString(root);
 
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(endpoint))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                .timeout(Duration.ofSeconds(10))
-                .build();
+        List<String> modelsToTry = List.of("gemini-flash-latest", "gemini-3.8-flash", "gemini-3.5-flash");
+        for (String modelName : modelsToTry) {
+            try {
+                String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey;
+                HttpRequest httpRequest = HttpRequest.newBuilder()
+                        .uri(URI.create(endpoint))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                        .timeout(Duration.ofSeconds(10))
+                        .build();
 
-        HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() == 200) {
-            JsonNode respNode = objectMapper.readTree(response.body());
-            JsonNode candidates = respNode.get("candidates");
-            if (candidates != null && candidates.isArray() && !candidates.isEmpty()) {
-                JsonNode textNode = candidates.get(0).path("content").path("parts").get(0).path("text");
-                return textNode.asText();
+                HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() == 200) {
+                    JsonNode respNode = objectMapper.readTree(response.body());
+                    JsonNode candidates = respNode.get("candidates");
+                    if (candidates != null && candidates.isArray() && !candidates.isEmpty()) {
+                        JsonNode textNode = candidates.get(0).path("content").path("parts").get(0).path("text");
+                        if (textNode != null && !textNode.asText().isBlank()) {
+                            return textNode.asText();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                logger.warn("Gemini model {} call failed: {}", modelName, e.getMessage());
             }
-        } else {
-            logger.warn("Gemini API call failed with status code {}: {}", response.statusCode(), response.body());
         }
         return null;
     }
@@ -243,7 +249,7 @@ public class AiService {
             int lowStockCount = lowStock.size();
 
             if ("ta".equals(lang)) {
-                return String.format("வணக்கம் நண்பா! நான் உங்கள் BizPartner AI வணிக நுண்ணறிவு கூட்டாளி.\n\n" +
+                return String.format("வணக்கம் நண்பா! நான் உங்கள் ProfitPilot AI வணிக நுண்ணறிவு கூட்டாளி.\n\n" +
                         "📊 **கடையின் தற்போதைய நேரலை நிலவரம்:**\n" +
                         "• மொத்த விற்பனை: ₹%s (%d பில்கள்)\n" +
                         "• நிகர இயக்க லாபம்: ₹%s\n" +
@@ -251,7 +257,7 @@ public class AiService {
                         "கடை வளர்ச்சி, புதிய கொள்முதல், தயாரிப்பு விவரங்கள் அல்லது வரி குறித்து என்னிடம் எதையும் கேளுங்கள்!",
                         totalSales, sales.size(), netProfit, lowStockCount);
             } else if ("hi".equals(lang)) {
-                return String.format("नमस्ते भाई! मैं आपका BizPartner AI बिजनेस पार्टनर हूँ।\n\n" +
+                return String.format("नमस्ते भाई! मैं आपका ProfitPilot AI बिजनेस पार्टनर हूँ।\n\n" +
                         "📊 **लाइव स्टोर स्थिति:**\n" +
                         "• कुल बिक्री: ₹%s (%d इनवॉइस)\n" +
                         "• शुद्ध लाभ: ₹%s\n" +
@@ -259,7 +265,7 @@ public class AiService {
                         "आप मुझसे इन्वेंट्री, खरीद सिफारिशें या मुनाफे के बारे में कभी भी पूछ सकते हैं!",
                         totalSales, sales.size(), netProfit, lowStockCount);
             } else {
-                return String.format("Hey bro! I am your BizPartner AI business partner with real-time access to your store database.\n\n" +
+                return String.format("Hey bro! I am your ProfitPilot AI business partner with real-time access to your store database.\n\n" +
                         "📊 **Live Store Snapshot:**\n" +
                         "• Gross Sales: ₹%s across %d transactions\n" +
                         "• Net Operating Profit: ₹%s\n" +
@@ -445,7 +451,7 @@ public class AiService {
         List<Inventory> lowStock = inventoryRepository.findLowStockItems();
 
         if ("ta".equals(lang)) {
-            return String.format("வணக்கம்! நான் உங்கள் நேரலை BizPartner AI வணிக நுண்ணறிவு கூட்டாளி.\n\n" +
+            return String.format("வணக்கம்! நான் உங்கள் நேரலை ProfitPilot AI வணிக நுண்ணறிவு கூட்டாளி.\n\n" +
                     "📊 **கடை நேரலை நிலவரம் (நேரலை தரவுத்தளம்):**\n" +
                     "• மொத்த விற்பனை: ₹%s (%d பில்கள்)\n" +
                     "• நிகர இயக்க லாபம்: ₹%s\n" +
@@ -458,7 +464,7 @@ public class AiService {
                     "💡 *முழுமையான ஜெனரேட்டிவ் AI மற்றும் கார்ட்டீசியா நரம்பியல் குரலுக்கு மேலே உள்ள 'Setup AI Keys' பொத்தானைப் பயன்படுத்தி உங்கள் API Key-களை இணைக்கவும்.*",
                     totalSales, sales.size(), netProfit, lowStock.size());
         } else if ("hi".equals(lang)) {
-            return String.format("नमस्ते! मैं आपका BizPartner AI बिजनेस पार्टनर हूँ।\n\n" +
+            return String.format("नमस्ते! मैं आपका ProfitPilot AI बिजनेस पार्टनर हूँ।\n\n" +
                     "📊 **स्टोर लाइव स्थिति (डेटाबेस):**\n" +
                     "• कुल बिक्री: ₹%s (%d इनवॉइस)\n" +
                     "• शुद्ध लाभ: ₹%s\n" +
@@ -471,7 +477,7 @@ public class AiService {
                     totalSales, sales.size(), netProfit, lowStock.size());
         }
 
-        return String.format("Hello! I am your BizPartner AI business partner with real-time access to your store database.\n\n" +
+        return String.format("Hello! I am your ProfitPilot AI business partner with real-time access to your store database.\n\n" +
                 "📊 **Live Store Snapshot:**\n" +
                 "• Gross Sales: ₹%s across %d transactions\n" +
                 "• Net Operating Profit: ₹%s\n" +

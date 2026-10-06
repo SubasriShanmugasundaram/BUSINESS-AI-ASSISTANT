@@ -1,12 +1,13 @@
-# BizPartner AI — Intelligent AI-Powered Business Assistant
+# ProfitPilot AI — Autonomous Business Management & Intelligence Platform
 
-> A complete, production-grade business management and autonomous intelligence platform for MSMEs, retail stores, supermarkets, and wholesalers.
+> **Live Demo:** [https://subasrishanmugasundaram.github.io/BUSINESS-AI-ASSISTANT/](https://subasrishanmugasundaram.github.io/BUSINESS-AI-ASSISTANT/)  
+> Enterprise MSME commerce, predictive forecasting, bilingual invoice management, and autonomous AI assistant.
 
 ---
 
 ## 🌟 Executive Overview
 
-**BizPartner AI** goes far beyond basic billing, bookkeeping, or CRUD operations. It executes an end-to-end intelligent lifecycle:
+**ProfitPilot AI** (by Spark'6 Enterprises) goes far beyond basic billing, bookkeeping, or CRUD operations. It executes an end-to-end intelligent lifecycle:
 
 ```
 RECORD  ───►  ANALYZE  ───►  PREDICT  ───►  RECOMMEND  ───►  ASSIST
@@ -144,7 +145,8 @@ npm run dev
 
 | Role | Email | Password |
 |---|---|---|
-| **MSME Owner / Administrator** | `admin@bizpartner.ai` | `password123` |
+| **Primary Owner / Admin** | `admin@profitpilot.ai` | `password123` |
+| **Legacy Admin** | `admin@bizpartner.ai` | `password123` |
 
 *A "1-Click Instant Enter" button is also provided on the login screen for testing.*
 

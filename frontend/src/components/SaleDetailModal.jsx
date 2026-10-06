@@ -1,21 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import { PrinterIcon, CheckIcon } from './Icons';
+import { api } from '../services/api';
 
-export default function SaleDetailModal({ isOpen, onClose, sale, businessInfo }) {
+export default function SaleDetailModal({ isOpen = true, onClose, sale, businessInfo }) {
+  const [fullSale, setFullSale] = useState(sale);
+
+  useEffect(() => {
+    setFullSale(sale);
+    if (sale && sale.id && (!sale.items || sale.items.length === 0)) {
+      api.getSaleById(sale.id)
+        .then(res => {
+          if (res) setFullSale(res);
+        })
+        .catch(() => {});
+    }
+  }, [sale]);
+
   if (!sale) return null;
+  const currentSale = fullSale || sale;
+
 
   const handlePrint = () => {
     window.print();
   };
 
-  const formattedDate = sale.saleDate || (sale.createdAt ? sale.createdAt.split(' ')[0] : 'N/A');
+  const formattedDate = currentSale.saleDate || (currentSale.createdAt ? currentSale.createdAt.split(' ')[0] : 'N/A');
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Sale Details - ${sale.saleNumber || '#' + sale.id}`}
+      title={`Sale Details - ${currentSale.saleNumber || '#' + currentSale.id}`}
       maxWidth="720px"
       footer={
         <>
@@ -33,7 +49,7 @@ export default function SaleDetailModal({ isOpen, onClose, sale, businessInfo })
         <div className="invoice-header">
           <div>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--primary)' }}>
-              {businessInfo?.name || 'Lakshmi Enterprise'}
+              {businessInfo?.name || "Spark'6 Enterprises"}
             </h2>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               {businessInfo?.tagline || 'Wholesale & Retail Commercial Trading'}
@@ -48,16 +64,16 @@ export default function SaleDetailModal({ isOpen, onClose, sale, businessInfo })
 
           <div style={{ textAlign: 'right' }}>
             <span className="badge badge-success" style={{ marginBottom: '0.5rem', fontSize: '0.8rem' }}>
-              <CheckIcon size={12} /> {sale.status || 'Completed'}
+              <CheckIcon size={12} /> {currentSale.status || 'Completed'}
             </span>
             <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-main)' }}>
-              {sale.saleNumber || `INV-${sale.id}`}
+              {currentSale.saleNumber || `INV-${currentSale.id}`}
             </div>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
               Date: <strong>{formattedDate}</strong>
             </div>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Payment: <strong>{sale.paymentMethod || 'Cash'}</strong>
+              Payment: <strong>{currentSale.paymentMethod || 'Cash'}</strong>
             </div>
           </div>
         </div>
@@ -69,16 +85,16 @@ export default function SaleDetailModal({ isOpen, onClose, sale, businessInfo })
               Billed To (Customer):
             </h4>
             <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-main)' }}>
-              {sale.customerName || 'Walk-in Customer'}
+              {currentSale.customerName || 'Walk-in Customer'}
             </div>
-            {sale.customerPhone && (
+            {currentSale.customerPhone && (
               <div style={{ fontSize: '0.825rem', color: 'var(--text-muted)', marginTop: '0.25rem', fontFamily: 'monospace' }}>
-                Phone: {sale.customerPhone}
+                Phone: {currentSale.customerPhone}
               </div>
             )}
-            {sale.customerAddress && (
+            {currentSale.customerAddress && (
               <div style={{ fontSize: '0.825rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                Address: {sale.customerAddress}
+                Address: {currentSale.customerAddress}
               </div>
             )}
           </div>
@@ -88,14 +104,14 @@ export default function SaleDetailModal({ isOpen, onClose, sale, businessInfo })
               Transaction Summary:
             </h4>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Total Line Items: <strong style={{ color: 'var(--text-main)' }}>{sale.items ? sale.items.length : 1}</strong>
+              Total Line Items: <strong style={{ color: 'var(--text-main)' }}>{currentSale.items ? currentSale.items.length : 1}</strong>
             </div>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-              Payment Method: <span className="badge badge-primary">{sale.paymentMethod}</span>
+              Payment Method: <span className="badge badge-primary">{currentSale.paymentMethod}</span>
             </div>
-            {sale.notes && (
+            {currentSale.notes && (
               <div style={{ fontSize: '0.825rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-                Notes: <em style={{ color: 'var(--support-lavender)' }}>{sale.notes}</em>
+                Notes: <em style={{ color: 'var(--support-lavender)' }}>{currentSale.notes}</em>
               </div>
             )}
           </div>
@@ -115,8 +131,8 @@ export default function SaleDetailModal({ isOpen, onClose, sale, businessInfo })
               </tr>
             </thead>
             <tbody>
-              {sale.items && sale.items.length > 0 ? (
-                sale.items.map((item, idx) => (
+              {currentSale.items && currentSale.items.length > 0 ? (
+                currentSale.items.map((item, idx) => (
                   <tr key={item.id || idx}>
                     <td style={{ color: 'var(--text-subtle)' }}>{idx + 1}</td>
                     <td style={{ fontWeight: 600 }}>{item.productName || `Product #${item.productId}`}</td>
@@ -133,9 +149,9 @@ export default function SaleDetailModal({ isOpen, onClose, sale, businessInfo })
                   <td>1</td>
                   <td>General Sale Transaction</td>
                   <td>-</td>
-                  <td style={{ textAlign: 'right' }}>₹{Number(sale.totalAmount).toFixed(2)}</td>
+                  <td style={{ textAlign: 'right' }}>₹{Number(currentSale.totalAmount).toFixed(2)}</td>
                   <td style={{ textAlign: 'center' }}>1</td>
-                  <td style={{ textAlign: 'right' }}>₹{Number(sale.totalAmount).toFixed(2)}</td>
+                  <td style={{ textAlign: 'right' }}>₹{Number(currentSale.totalAmount).toFixed(2)}</td>
                 </tr>
               )}
             </tbody>
@@ -147,7 +163,7 @@ export default function SaleDetailModal({ isOpen, onClose, sale, businessInfo })
           <div style={{ width: '280px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', fontSize: '0.9rem' }}>
               <span style={{ color: 'var(--text-muted)' }}>Subtotal:</span>
-              <span>₹{Number(sale.totalAmount).toFixed(2)}</span>
+              <span>₹{Number(currentSale.totalAmount).toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
               <span>Tax (GST 0%):</span>
@@ -165,14 +181,14 @@ export default function SaleDetailModal({ isOpen, onClose, sale, businessInfo })
               }}
             >
               <span>Total Amount:</span>
-              <span>₹{Number(sale.totalAmount).toFixed(2)}</span>
+              <span>₹{Number(currentSale.totalAmount).toFixed(2)}</span>
             </div>
           </div>
         </div>
 
         {/* Footer info */}
         <div style={{ borderTop: '1px dashed var(--border-color)', marginTop: '2rem', paddingTop: '1rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
-          Thank you for your business! This is a computer generated invoice powered by BizPartner AI.
+          Thank you for your business! This is a computer generated invoice powered by ProfitPilot AI.
         </div>
       </div>
     </Modal>

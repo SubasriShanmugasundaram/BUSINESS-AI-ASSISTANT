@@ -7,10 +7,10 @@ export default function LoginPage({ onLogin }) {
   const [errorMessage, setErrorMessage] = useState('');
 
   // Form Fields
-  const [email, setEmail] = useState('admin@bizpartner.ai');
+  const [email, setEmail] = useState('admin@profitpilot.ai');
   const [password, setPassword] = useState('password123');
-  const [name, setName] = useState('Pranesh Sivakumar');
-  const [businessName, setBusinessName] = useState('Lakshmi Enterprise');
+  const [name, setName] = useState("Spark'6 Admin");
+  const [businessName, setBusinessName] = useState("Spark'6 Enterprises");
   const [phone, setPhone] = useState('+91 9876543210');
   const [gstin, setGstin] = useState('29ABCDE1234F1Z5');
   const [address, setAddress] = useState('102 Market Road, Bengaluru - 560001');
@@ -51,9 +51,9 @@ export default function LoginPage({ onLogin }) {
 
   const handleDemoLogin = async () => {
     setErrorMessage('');
-    setEmail('admin@bizpartner.ai');
+    setEmail('admin@profitpilot.ai');
     setPassword('password123');
-    const res = await login('admin@bizpartner.ai', 'password123');
+    const res = await login('admin@profitpilot.ai', 'password123');
     if (!res.success) {
       setErrorMessage(res.error || 'Demo login failed');
     } else if (onLogin) {
@@ -192,7 +192,7 @@ export default function LoginPage({ onLogin }) {
               <input
                 type="email"
                 className="form-input"
-                placeholder="admin@bizpartner.ai"
+                placeholder="admin@profitpilot.ai"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -244,7 +244,7 @@ export default function LoginPage({ onLogin }) {
                 onClick={handleDemoLogin}
                 disabled={loading}
               >
-                ⚡ 1-Click Instant Owner Login (admin@bizpartner.ai)
+                ⚡ 1-Click Instant Owner Login (admin@profitpilot.ai)
               </button>
             </div>
           )}

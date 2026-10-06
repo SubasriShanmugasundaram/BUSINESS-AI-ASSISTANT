@@ -18,7 +18,7 @@ export default function AiAssistantModal({ isOpen, onClose }) {
   const getWelcomeMessage = (lang) => {
     if (lang === 'ta') {
       return {
-        text: "வணக்கம்! நான் உங்கள் BizPartner AI வணிக நுண்ணறிவு கூட்டாளி. உங்கள் கடையின் நேரலை விற்பனை வேகம், சரக்கு இருப்பு மற்றும் இயக்க லாப வரம்புகளை நான் நேரடியாகக் கண்காணிக்கிறேன். இன்று உங்கள் வணிகத்திற்கு நான் எவ்வாறு உதவலாம்?",
+        text: "வணக்கம்! நான் உங்கள் ProfitPilot AI வணிக நுண்ணறிவு கூட்டாளி. உங்கள் கடையின் நேரலை விற்பனை வேகம், சரக்கு இருப்பு மற்றும் இயக்க லாப வரம்புகளை நான் நேரடியாகக் கண்காணிக்கிறேன். இன்று உங்கள் வணிகத்திற்கு நான் எவ்வாறு உதவலாம்?",
         actions: [
           "எந்த பொருட்களை நான் வாங்க வேண்டும்?",
           "எந்த பொருள் அதிகமாக விற்கிறது?",
@@ -30,7 +30,7 @@ export default function AiAssistantModal({ isOpen, onClose }) {
     }
     if (lang === 'hi') {
       return {
-        text: "नमस्ते! मैं आपका BizPartner AI बिजनेस पार्टनर हूँ। मेरे पास आपकी बिक्री गति, इन्वेंट्री स्टॉक और लाभ मार्जिन की लाइव जानकारी है। आज मैं आपकी क्या मदद कर सकता हूँ?",
+        text: "नमस्ते! मैं आपका ProfitPilot AI बिजनेस पार्टनर हूँ। मेरे पास आपकी बिक्री गति, इन्वेंट्री स्टॉक और लाभ मार्जिन की लाइव जानकारी है। आज मैं आपकी क्या मदद कर सकता हूँ?",
         actions: [
           "मुझे कौन से उत्पाद खरीदने चाहिए?",
           "सबसे ज्यादा कौन सा उत्पाद बिकता है?",
@@ -41,7 +41,7 @@ export default function AiAssistantModal({ isOpen, onClose }) {
       };
     }
     return {
-      text: "Hello! I am BizPartner AI, your business intelligence partner. I have direct visibility into your live sales velocity, inventory stock levels, and operating margins. How can I assist your business today?",
+      text: "Hello! I am ProfitPilot AI, your business intelligence partner. I have direct visibility into your live sales velocity, inventory stock levels, and operating margins. How can I assist your business today?",
       actions: [
         "Which products should I purchase?",
         "Which product sells the most?",
@@ -220,7 +220,7 @@ export default function AiAssistantModal({ isOpen, onClose }) {
             </div>
             <div>
               <div className="editorial-kicker" style={{ fontSize: '0.675rem' }}>
-                BIZPARTNER AI
+                PROFITPILOT AI
               </div>
               <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '1.25rem', color: 'var(--color-text-primary)' }}>
                 Your Business Intelligence Partner

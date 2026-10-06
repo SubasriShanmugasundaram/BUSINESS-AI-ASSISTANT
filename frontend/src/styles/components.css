@@ -686,7 +686,8 @@
 /* ==========================================================
    10. MODALS & OVERLAYS
    ========================================================== */
-.modal-backdrop {
+.modal-backdrop,
+.modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
@@ -699,7 +700,8 @@
   animation: fadeIn 200ms ease;
 }
 
-.modal-container {
+.modal-container,
+.modal-content {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);

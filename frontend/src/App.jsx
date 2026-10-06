@@ -18,7 +18,6 @@ import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { BotIcon } from './components/Icons';
 import './styles/index.css';
-import './styles/components.css';
 
 function MainApp() {
   const { currentUser, logout } = useAuth();
@@ -32,12 +31,23 @@ function MainApp() {
   // Business Information
   const [businessInfo, setBusinessInfo] = useState(() => {
     const saved = localStorage.getItem('msme_business_info');
-    return saved ? JSON.parse(saved) : {
-      businessName: 'Lakshmi Enterprise',
-      name: 'Lakshmi Enterprise',
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.name?.includes('Lakshmi') || parsed.businessName?.includes('Lakshmi')) {
+          parsed.name = "Spark'6 Enterprises";
+          parsed.businessName = "Spark'6 Enterprises";
+          localStorage.setItem('msme_business_info', JSON.stringify(parsed));
+        }
+        return parsed;
+      } catch (e) {}
+    }
+    return {
+      businessName: "Spark'6 Enterprises",
+      name: "Spark'6 Enterprises",
       tagline: 'Wholesale & Retail Commercial Trading',
       phone: '+91 9876543210',
-      email: 'contact@lakshmi.in',
+      email: 'contact@spark6.in',
       gstin: '29ABCDE1234F1Z5',
       address: '102 Market Road, Bengaluru - 560001'
     };
@@ -67,7 +77,7 @@ function MainApp() {
   }, []);
 
   if (!currentUser) {
-    return <LoginPage onLogin={() => showToast('Welcome to BizPartner AI!', 'success')} />;
+    return <LoginPage onLogin={() => showToast('Welcome to ProfitPilot AI!', 'success')} />;
   }
 
   return (
@@ -170,7 +180,7 @@ function MainApp() {
       <button
         className="floating-ai-fab"
         onClick={() => setIsAiModalOpen(true)}
-        title="Open BizPartner AI Business Assistant (Alt+A)"
+        title="Open ProfitPilot AI Business Assistant (Alt+A)"
         style={{
           position: 'fixed',
           bottom: '24px',

@@ -44,8 +44,11 @@ public class InventoryController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<InventoryDTO>> searchInventory(@RequestParam(required = false) String query) {
-        return ResponseEntity.ok(inventoryService.getAllInventory(query, null));
+    public ResponseEntity<List<InventoryDTO>> searchInventory(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String keyword) {
+        String searchTerm = (query != null && !query.trim().isEmpty()) ? query : keyword;
+        return ResponseEntity.ok(inventoryService.getAllInventory(searchTerm, null));
     }
 
     @GetMapping("/{productId}")
@@ -56,9 +59,16 @@ public class InventoryController {
     @PutMapping("/{productId}")
     public ResponseEntity<InventoryDTO> updateInventoryByProductId(
             @PathVariable Long productId,
-            @RequestBody StockOperationRequestDTO request) {
-        request.setProductId(productId);
-        return ResponseEntity.ok(inventoryService.updateStock(request));
+            @RequestParam(required = false) Integer currentStock,
+            @RequestParam(required = false) Integer reorderLevel,
+            @RequestBody(required = false) StockOperationRequestDTO request) {
+        if (request != null && request.getOperationType() != null) {
+            request.setProductId(productId);
+            return ResponseEntity.ok(inventoryService.updateStock(request));
+        }
+        Integer effStock = (request != null && request.getQuantity() != null) ? request.getQuantity() : currentStock;
+        Integer effReorder = (request != null && request.getReorderLevel() != null) ? request.getReorderLevel() : reorderLevel;
+        return ResponseEntity.ok(inventoryService.updateInventoryDirect(productId, effStock, effReorder));
     }
 
     @PostMapping("/adjust")

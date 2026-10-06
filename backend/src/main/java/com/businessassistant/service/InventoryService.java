@@ -68,6 +68,21 @@ public class InventoryService {
                 });
     }
 
+    public InventoryDTO updateInventoryDirect(Long productId, Integer currentStock, Integer reorderLevel) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
+        Inventory inventory = getOrCreateInventory(product);
+        if (currentStock != null) {
+            inventory.setCurrentStock(Math.max(0, currentStock));
+            inventory.setLastRestockedAt(LocalDateTime.now());
+        }
+        if (reorderLevel != null) {
+            inventory.setReorderLevel(Math.max(0, reorderLevel));
+        }
+        Inventory saved = inventoryRepository.save(inventory);
+        return toDTO(saved);
+    }
+
     public InventoryDTO updateStock(StockOperationRequestDTO request) {
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + request.getProductId()));

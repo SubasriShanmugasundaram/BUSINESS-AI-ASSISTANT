@@ -155,20 +155,23 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
 
   // Handle Quick Add Customer
   const handleQuickAddCustomer = async (e) => {
-    e.preventDefault();
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
     if (!newCustomerData.name.trim() || !newCustomerData.phone.trim()) {
       showToast('Customer Name and Phone are required', 'error');
       return;
     }
     try {
       const created = await api.createCustomer(newCustomerData);
-      setCustomers([...customers, created]);
+      const updatedList = await api.getCustomers();
+      setCustomers(updatedList || [...customers, created]);
       setSelectedCustomerId(created.id);
       setIsQuickCustomerOpen(false);
       setNewCustomerData({ name: '', phone: '', email: '', address: '' });
       showToast('Customer created and selected!', 'success');
     } catch (err) {
-      showToast('Error saving new customer', 'error');
+      showToast(err.message || 'Error saving new customer', 'error');
     }
   };
 
@@ -220,8 +223,20 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
                   ))}
                 </select>
                 {selectedCustomerObj && (
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-                    📍 {selectedCustomerObj.address || 'No registered address'}
+                  <div style={{ fontSize: '0.8rem', marginTop: '0.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', background: 'var(--color-surface-subtle)', padding: '0.4rem 0.75rem', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
+                    <span style={{ color: 'var(--color-accent-strong)', fontWeight: 600 }}>
+                      📞 {selectedCustomerObj.phone || 'No Phone Number'}
+                    </span>
+                    {selectedCustomerObj.address && (
+                      <span style={{ color: 'var(--color-text-secondary)' }}>
+                        📍 {selectedCustomerObj.address}
+                      </span>
+                    )}
+                    {selectedCustomerObj.email && (
+                      <span style={{ color: 'var(--color-text-muted)' }}>
+                        ✉️ {selectedCustomerObj.email}
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
@@ -259,7 +274,7 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
                   <option value="">-- {t('Select Product')} --</option>
                   {products.map(p => (
                     <option key={p.id} value={p.id}>
-                      {p.name} (₹{Number(p.sellingPrice).toFixed(2)})
+                      {t(p.name)} (₹{Number(p.sellingPrice).toFixed(2)})
                     </option>
                   ))}
                 </select>
@@ -299,12 +314,12 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th style={{ textAlign: 'right' }}>Price</th>
-                    <th style={{ textAlign: 'center' }}>Qty</th>
-                    <th style={{ textAlign: 'right' }}>Subtotal</th>
-                    <th style={{ textAlign: 'center' }}>Action</th>
+                    <th>{t('Product')}</th>
+                    <th>{t('Category')}</th>
+                    <th style={{ textAlign: 'right' }}>{t('Price')}</th>
+                    <th style={{ textAlign: 'center' }}>{t('Quantity')}</th>
+                    <th style={{ textAlign: 'right' }}>{t('Subtotal')}</th>
+                    <th style={{ textAlign: 'center' }}>{t('Actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -312,8 +327,8 @@ export default function SalesPage({ showToast, setActiveTab, businessInfo }) {
                     items.map((item, idx) => (
                       <tr key={idx}>
                         <td>{idx + 1}</td>
-                        <td style={{ fontWeight: 600 }}>{item.productName}</td>
-                        <td><span className="badge badge-secondary">{item.category}</span></td>
+                        <td style={{ fontWeight: 600 }}>{t(item.productName)}</td>
+                        <td><span className="badge badge-secondary">{t(item.category)}</span></td>
                         <td style={{ textAlign: 'right' }}>₹{item.sellingPrice.toFixed(2)}</td>
                         <td style={{ textAlign: 'center', fontWeight: 600 }}>{item.quantity}</td>
                         <td style={{ textAlign: 'right', fontWeight: 700 }}>₹{item.totalAmount.toFixed(2)}</td>

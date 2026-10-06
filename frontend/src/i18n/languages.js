@@ -28,4 +28,4 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'ur', name: 'Urdu', nativeName: 'اردو', dir: 'rtl' },
 ];
 
-export const DEFAULT_LANGUAGE = 'en';
+export const DEFAULT_LANGUAGE = 'hi';

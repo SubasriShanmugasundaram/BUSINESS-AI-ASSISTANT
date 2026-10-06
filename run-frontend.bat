@@ -1,7 +1,7 @@
 @echo off
 echo ========================================================
-echo Starting BizPartner AI - Frontend (React + Vite)
+echo Starting ProfitPilot AI - Frontend (React + Vite)
 echo ========================================================
-cd frontend
+cd /d "%~dp0frontend"
 npm run dev
 pause

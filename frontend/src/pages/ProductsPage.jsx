@@ -10,6 +10,7 @@ import {
   RefreshIcon
 } from '../components/Icons';
 import { api } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 const CATEGORIES = [
   'All Categories',
@@ -23,6 +24,7 @@ const CATEGORIES = [
 ];
 
 export default function ProductsPage({ showToast, globalSearch = '' }) {
+  const { t } = useLanguage();
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState(globalSearch);
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
@@ -166,19 +168,19 @@ export default function ProductsPage({ showToast, globalSearch = '' }) {
       <div className="page-header">
         <div className="page-title-group">
           <h1>
-            Product Catalog
+            {t('Product Catalog')}
           </h1>
           <p className="page-subtitle">
-            Configure items, pricing structures, categories, and future inventory links.
+            {t('Configure items, pricing structures, categories, and future inventory links.')}
           </p>
         </div>
 
         <div className="page-actions">
-          <button className="btn btn-secondary" onClick={fetchProducts} title="Refresh">
+          <button className="btn btn-secondary" onClick={fetchProducts} title={t('Refresh')}>
             <RefreshIcon size={16} />
           </button>
           <button className="btn btn-primary" onClick={handleOpenAdd}>
-            <PlusIcon size={16} /> Add Product
+            <PlusIcon size={16} /> {t('Add Product')}
           </button>
         </div>
       </div>
@@ -190,7 +192,7 @@ export default function ProductsPage({ showToast, globalSearch = '' }) {
           <input
             type="text"
             className="form-control"
-            placeholder="Search products by name or category..."
+            placeholder={t('Search products by name or category...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -204,12 +206,12 @@ export default function ProductsPage({ showToast, globalSearch = '' }) {
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
             {CATEGORIES.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat} value={cat}>{t(cat)}</option>
             ))}
           </select>
 
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Showing <strong>{filteredProducts.length}</strong> items
+            {t('Showing')} <strong>{filteredProducts.length}</strong> {t('items')}
           </span>
         </div>
       </div>
@@ -220,14 +222,14 @@ export default function ProductsPage({ showToast, globalSearch = '' }) {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Category</th>
-                <th style={{ textAlign: 'right' }}>Selling Price</th>
-                <th style={{ textAlign: 'right' }}>Cost Price</th>
-                <th style={{ textAlign: 'right' }}>Margin</th>
-                <th>Added Date</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>{t('PRODUCT ID')}</th>
+                <th>{t('PRODUCT NAME')}</th>
+                <th>{t('CATEGORY')}</th>
+                <th style={{ textAlign: 'right' }}>{t('Selling Price')}</th>
+                <th style={{ textAlign: 'right' }}>{t('Purchase Price')}</th>
+                <th style={{ textAlign: 'right' }}>{t('MARGIN')}</th>
+                <th>{t('ADDED DATE')}</th>
+                <th style={{ textAlign: 'right' }}>{t('ACTIONS')}</th>
               </tr>
             </thead>
             <tbody>
@@ -244,16 +246,16 @@ export default function ProductsPage({ showToast, globalSearch = '' }) {
                       </td>
                       <td>
                         <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                          {prod.name}
+                          {t(prod.name)}
                         </div>
                         {prod.description && (
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '280px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {prod.description}
+                            {t(prod.description)}
                           </div>
                         )}
                       </td>
                       <td>
-                        <span className="badge badge-primary">{prod.category}</span>
+                        <span className="badge badge-primary">{t(prod.category)}</span>
                       </td>
                       <td style={{ textAlign: 'right', fontWeight: 700 }}>
                         ₹{sell.toFixed(2)}
@@ -274,21 +276,21 @@ export default function ProductsPage({ showToast, globalSearch = '' }) {
                           <button
                             className="btn btn-sm btn-secondary"
                             onClick={() => handleOpenView(prod)}
-                            title="View Details"
+                            title={t('View Details')}
                           >
                             <EyeIcon size={14} />
                           </button>
                           <button
                             className="btn btn-sm btn-secondary"
                             onClick={() => handleOpenEdit(prod)}
-                            title="Edit Product"
+                            title={t('Edit Product')}
                           >
                             <EditIcon size={14} />
                           </button>
                           <button
                             className="btn btn-sm btn-danger-outline"
                             onClick={() => handleOpenDelete(prod)}
-                            title="Delete Product"
+                            title={t('Delete Product')}
                           >
                             <TrashIcon size={14} />
                           </button>
@@ -301,7 +303,7 @@ export default function ProductsPage({ showToast, globalSearch = '' }) {
                 <tr>
                   <td colSpan="8" className="table-empty-state">
                     <ProductsIcon size={36} />
-                    <p>No products found matching the criteria.</p>
+                    <p>{t('No product transactions recorded yet')}</p>
                   </td>
                 </tr>
               )}
@@ -404,39 +406,39 @@ export default function ProductsPage({ showToast, globalSearch = '' }) {
         <Modal
           isOpen={isViewModalOpen}
           onClose={() => setIsViewModalOpen(false)}
-          title={`Product Details: ${currentProduct.name}`}
+          title={`${t('Product Details')}: ${t(currentProduct.name)}`}
           footer={
             <button className="btn btn-primary" onClick={() => setIsViewModalOpen(false)}>
-              Done
+              {t('Save')}
             </button>
           }
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Product ID:</span>
+              <span style={{ color: 'var(--text-muted)' }}>{t('PRODUCT ID')}:</span>
               <strong>PROD-{String(currentProduct.id).padStart(4, '0')}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Category:</span>
-              <span className="badge badge-primary">{currentProduct.category}</span>
+              <span style={{ color: 'var(--text-muted)' }}>{t('Category')}:</span>
+              <span className="badge badge-primary">{t(currentProduct.category)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Selling Price:</span>
+              <span style={{ color: 'var(--text-muted)' }}>{t('Selling Price')}:</span>
               <strong style={{ fontSize: '1.1rem', color: 'var(--primary)' }}>₹{Number(currentProduct.sellingPrice).toFixed(2)}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Purchase / Cost Price:</span>
+              <span style={{ color: 'var(--text-muted)' }}>{t('Purchase Price')}:</span>
               <strong>₹{Number(currentProduct.purchasePrice || 0).toFixed(2)}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Estimated Margin:</span>
+              <span style={{ color: 'var(--text-muted)' }}>{t('MARGIN')}:</span>
               <strong style={{ color: 'var(--success)' }}>
                 ₹{(Number(currentProduct.sellingPrice) - Number(currentProduct.purchasePrice || 0)).toFixed(2)}
               </strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Description:</span>
-              <span style={{ maxWidth: '60%', textAlign: 'right' }}>{currentProduct.description || 'No description provided'}</span>
+              <span style={{ color: 'var(--text-muted)' }}>{t('Description')}:</span>
+              <span style={{ maxWidth: '60%', textAlign: 'right' }}>{t(currentProduct.description) || '—'}</span>
             </div>
           </div>
         </Modal>
@@ -447,24 +449,21 @@ export default function ProductsPage({ showToast, globalSearch = '' }) {
         <Modal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
-          title="Confirm Delete Product"
+          title={t('Delete Product')}
           maxWidth="440px"
           footer={
             <>
               <button className="btn btn-secondary" onClick={() => setIsDeleteModalOpen(false)}>
-                Cancel
+                {t('Cancel')}
               </button>
               <button className="btn btn-danger" onClick={handleDelete}>
-                Delete Product
+                {t('Delete')}
               </button>
             </>
           }
         >
           <p>
-            Are you sure you want to remove <strong>{currentProduct.name}</strong> from catalog?
-          </p>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-            Note: Existing historical sales records will retain this item name.
+            {t('Are you sure you want to remove')} <strong>{t(currentProduct.name)}</strong>?
           </p>
         </Modal>
       )}

@@ -1,10 +1,11 @@
 @echo off
 echo ========================================================
-echo Launching BizPartner AI - Full Stack Platform
+echo Launching ProfitPilot AI - Full Stack Platform
 echo ========================================================
-start "BizPartner AI - Backend" run-backend.bat
-start "BizPartner AI - ML Service" run-ml.bat
-start "BizPartner AI - Frontend" run-frontend.bat
+cd /d "%~dp0"
+start "ProfitPilot AI - Backend" run-backend.bat
+start "ProfitPilot AI - ML Service" run-ml.bat
+start "ProfitPilot AI - Frontend" run-frontend.bat
 echo Starting all microservices...
 echo  - Frontend Web UI:      http://localhost:5173
 echo  - Spring Boot Backend:  http://localhost:8080/api

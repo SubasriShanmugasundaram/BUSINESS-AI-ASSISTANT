@@ -254,7 +254,7 @@ export default function InventoryPage({ showToast }) {
                           </td>
                           <td>
                             <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                              {item.productName}
+                              {t(item.productName)}
                             </div>
                             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                               Last Restocked: {item.lastRestockedAt ? new Date(item.lastRestockedAt).toLocaleDateString() : 'Initial Setup'}
@@ -350,7 +350,7 @@ export default function InventoryPage({ showToast }) {
                           {mov.movementDate || '—'}
                         </td>
                         <td style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                          {mov.productName}
+                          {t(mov.productName)}
                         </td>
                         <td>
                           <span

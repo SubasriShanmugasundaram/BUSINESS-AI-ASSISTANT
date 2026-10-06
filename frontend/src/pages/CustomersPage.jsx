@@ -105,8 +105,13 @@ export default function CustomersPage({ showToast, globalSearch = '' }) {
 
   // Save Customer (Add or Edit)
   const handleSave = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+    if (!validateForm()) {
+      showToast('Please enter Customer Name and a valid Phone Number', 'error');
+      return;
+    }
 
     try {
       if (currentCustomer) {
@@ -117,6 +122,7 @@ export default function CustomersPage({ showToast, globalSearch = '' }) {
         showToast('New customer added successfully!', 'success');
       }
       setIsFormModalOpen(false);
+      setFormData({ name: '', phone: '', email: '', address: '' });
       fetchCustomers();
     } catch (err) {
       showToast(err.message || 'Error saving customer', 'error');

@@ -11,7 +11,7 @@ export default function SettingsPage({ businessInfo, setBusinessInfo, showToast 
   const { currentUser } = useAuth();
 
   const [formData, setFormData] = useState({
-    businessName: businessInfo?.name || businessInfo?.businessName || 'Lakshmi Enterprise',
+    businessName: businessInfo?.name || businessInfo?.businessName || "Spark'6 Enterprises",
     tagline: businessInfo?.tagline || 'Wholesale & Retail Commercial Trading',
     phone: businessInfo?.phone || '+91 9876543210',
     email: businessInfo?.email || 'contact@lakshmi.in',
@@ -311,8 +311,8 @@ export default function SettingsPage({ businessInfo, setBusinessInfo, showToast 
               <span className="badge badge-success">Authenticated</span>
             </div>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              <div><strong>Name:</strong> {currentUser?.name || 'Administrator'}</div>
-              <div><strong>Email:</strong> {currentUser?.email || 'admin@bizpartner.ai'}</div>
+              <div><strong>Name:</strong> {currentUser?.name || "Spark'6 Admin"}</div>
+              <div><strong>Email:</strong> {currentUser?.email || 'admin@profitpilot.ai'}</div>
               <div><strong>Role:</strong> {currentUser?.role || 'ROLE_OWNER'}</div>
             </div>
           </div>

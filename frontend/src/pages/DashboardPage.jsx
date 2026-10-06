@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StatCard from '../components/StatCard';
 import ChartCard from '../components/ChartCard';
-import AIInsight from '../components/AIInsight';
 import SaleDetailModal from '../components/SaleDetailModal';
 import {
   CustomersIcon,
@@ -80,8 +79,8 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
       if (reportsRes) {
         if (reportsRes.salesByDate) {
           setChartData(reportsRes.salesByDate.map(item => ({
-            label: item.date.slice(5),
-            value: item.amount
+            label: item?.date ? String(item.date).slice(5) : '',
+            value: Number(item?.amount) || 0
           })));
         }
         if (reportsRes.topProducts) {
@@ -127,7 +126,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
             <span>●</span> {t('Executive Intelligence Workspace')}
           </div>
           <h1 className="page-title">
-            {businessInfo?.name || businessInfo?.businessName || 'Lakshmi Enterprise'}
+            {t(businessInfo?.name || businessInfo?.businessName || "Spark'6 Enterprises")}
           </h1>
           <p className="page-subtitle">
             {currentDateStr} • {t('Real-time financial velocity, inventory stock intelligence & autonomous ML predictions')}
@@ -139,30 +138,15 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
             <RefreshIcon size={15} /> {t('Refresh')}
           </button>
           <button className="btn btn-primary" onClick={() => setActiveTab('sales')}>
-            <PlusIcon size={15} /> {t('+ POS Counter')}
+            <PlusIcon size={15} /> {t('+ Billing Counter')}
           </button>
         </div>
       </div>
 
-      {/* 2. Distinctive AI Business Insight Component (Section 16) */}
-      <AIInsight
-        title={t('AI BUSINESS INSIGHT')}
-        insight={
-          inventorySummary.lowStock > 0
-            ? `${inventorySummary.lowStock} products are running below safety reorder threshold. Fast consumption velocity indicates risk of stockout within 5 days.`
-            : t('Sales velocity is holding steady with positive net operating profit margins. High customer repeat rates observed across staples.')
-        }
-        source={t('Generated autonomously from live store telemetry & consumption velocity')}
-        primaryActionLabel={t('Review Recommendations')}
-        onPrimaryAction={() => setActiveTab('inventory')}
-        secondaryActionLabel={t('Open AI Assistant')}
-        onSecondaryAction={onOpenAiModal ? onOpenAiModal : undefined}
-      />
-
       {/* 3. Primary Minimal KPI Cards (Section 15) */}
       <div className="grid-kpi">
         <StatCard
-          title={t('kpi.totalSales')}
+          title={t('Total Sales')}
           value={`₹${financials.totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           icon={CurrencyIcon}
           colorClass="green"
@@ -171,7 +155,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           trendDirection="up"
         />
         <StatCard
-          title={t('kpi.totalExpenses')}
+          title={t('Total Expenses')}
           value={`₹${financials.totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           icon={SalesIcon}
           colorClass="orange"
@@ -180,7 +164,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           trendDirection="neutral"
         />
         <StatCard
-          title={t('kpi.netProfit')}
+          title={t('Net Profit')}
           value={`₹${financials.netProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           icon={CurrencyIcon}
           colorClass={financials.netProfit >= 0 ? "green" : "red"}
@@ -189,7 +173,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           trendDirection={financials.netProfit >= 0 ? "up" : "down"}
         />
         <StatCard
-          title={t('kpi.totalCustomers')}
+          title={t('Total Customers')}
           value={stats.totalCustomers || 5}
           icon={CustomersIcon}
           colorClass="blue"
@@ -198,7 +182,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           trendDirection="up"
         />
         <StatCard
-          title={t('kpi.totalProducts')}
+          title={t('Total Products')}
           value={stats.totalProducts || 8}
           icon={ProductsIcon}
           colorClass="purple"
@@ -290,7 +274,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
                 padding: '0.85rem 1rem'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>{rec.productName}</span>
+                  <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>{t(rec.productName)}</span>
                   <span className={`badge ${rec.priority === 'HIGH' ? 'status-badge-outofstock' : 'status-badge-lowstock'}`}>
                     {rec.priority}
                   </span>
@@ -339,7 +323,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
                 return (
                   <div key={idx}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '0.35rem' }}>
-                      <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{p.productName}</span>
+                      <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{t(p.productName)}</span>
                       <span style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
                         {p.totalQuantitySold} {t('units')} (₹{Number(p.totalRevenue || 0).toLocaleString()})
                       </span>
@@ -359,11 +343,11 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
       <div className="card">
         <div className="card-header">
           <div>
-            <h3 className="card-title">Recent Transactions</h3>
-            <p className="card-subtitle">Verified point-of-sale checkout records</p>
+            <h3 className="card-title">{t('Recent Transactions')}</h3>
+            <p className="card-subtitle">{t('Verified point-of-sale checkout records')}</p>
           </div>
           <button className="btn btn-sm btn-secondary" onClick={() => setActiveTab('history')}>
-            View All Sales →
+            {t('View All Sales →')}
           </button>
         </div>
 
@@ -371,13 +355,13 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
           <table className="data-table">
             <thead>
               <tr>
-                <th>Invoice #</th>
-                <th>Customer</th>
-                <th>Date</th>
-                <th>Amount</th>
-                <th>Payment</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>{t('Invoice #')}</th>
+                <th>{t('Customer')}</th>
+                <th>{t('Date')}</th>
+                <th>{t('Amount')}</th>
+                <th>{t('Payment')}</th>
+                <th>{t('Status')}</th>
+                <th>{t('Action')}</th>
               </tr>
             </thead>
             <tbody>
@@ -386,20 +370,20 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
                   <td style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', color: 'var(--color-accent-strong)' }}>
                     {sale.saleNumber}
                   </td>
-                  <td>{sale.customerName || 'Walk-in Customer'}</td>
+                  <td>{sale.customerName ? t(sale.customerName) : t('Walk-in Customer')}</td>
                   <td style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>{sale.saleDate}</td>
                   <td style={{ fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                     ₹{Number(sale.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </td>
-                  <td><span className="badge" style={{ background: 'var(--color-surface-subtle)', border: '1px solid var(--color-border)' }}>{sale.paymentMethod}</span></td>
-                  <td><span className="badge status-badge-instock">Paid</span></td>
+                  <td><span className="badge" style={{ background: 'var(--color-surface-subtle)', border: '1px solid var(--color-border)' }}>{t(sale.paymentMethod)}</span></td>
+                  <td><span className="badge status-badge-instock">{t('Paid')}</span></td>
                   <td>
                     <button
                       type="button"
                       className="btn-icon"
                       style={{ background: 'transparent', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer' }}
                       onClick={() => setSelectedSale(sale)}
-                      title="View Invoice Details"
+                      title={t('View Invoice Details')}
                     >
                       <EyeIcon size={16} />
                     </button>
@@ -414,6 +398,7 @@ export default function DashboardPage({ setActiveTab, businessInfo, showToast, o
       {/* Invoice Modal */}
       {selectedSale && (
         <SaleDetailModal
+          isOpen={!!selectedSale}
           sale={selectedSale}
           businessInfo={businessInfo}
           onClose={() => setSelectedSale(null)}

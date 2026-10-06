@@ -42,7 +42,7 @@ export default function TopBar({ businessName, onSearch, setMobileOpen, onOpenPr
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
-            {businessName || 'Lakshmi Enterprise'}
+            {businessName || "Spark'6 Enterprises"}
           </h2>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
             {t('Digital Business Partner')}

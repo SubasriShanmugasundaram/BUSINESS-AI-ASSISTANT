@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
           name: resp.name,
           email: resp.email,
           role: resp.role,
-          businessName: resp.businessProfile?.businessName || 'Lakshmi Enterprise'
+          businessName: resp.businessProfile?.businessName || "Spark'6 Enterprises"
         }));
         if (resp.businessProfile) {
           localStorage.setItem('msme_business_info', JSON.stringify(resp.businessProfile));
@@ -37,20 +37,20 @@ export function AuthProvider({ children }) {
           name: resp.name,
           email: resp.email,
           role: resp.role,
-          businessName: resp.businessProfile?.businessName || 'Lakshmi Enterprise'
+          businessName: resp.businessProfile?.businessName || "Spark'6 Enterprises"
         });
         return { success: true };
       }
       throw new Error('Invalid server response');
     } catch (err) {
       // Local fallback for offline demo testing
-      if (email === 'admin@bizpartner.ai' && password === 'password123') {
+      if ((email === 'admin@profitpilot.ai' || email === 'admin@bizpartner.ai') && password === 'password123') {
         const demoUser = {
           id: 1,
-          name: 'Pranesh Sivakumar',
-          email: 'admin@bizpartner.ai',
+          name: "Spark'6 Admin",
+          email: 'admin@profitpilot.ai',
           role: 'ROLE_OWNER',
-          businessName: 'Lakshmi Enterprise'
+          businessName: "Spark'6 Enterprises"
         };
         localStorage.setItem('msme_auth_token', 'demo-token-' + Date.now());
         localStorage.setItem('msme_auth_user', JSON.stringify(demoUser));

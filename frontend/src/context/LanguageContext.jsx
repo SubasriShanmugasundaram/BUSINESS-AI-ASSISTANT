@@ -138,6 +138,25 @@ const REGIONAL_TERMS = {
   }
 };
 
+// Core script-family fallback map for all 23 official Eighth Schedule Indian languages
+const SCRIPT_FAMILY_FALLBACKS = {
+  // Devanagari Script Family: Bodo, Dogri, Konkani, Maithili, Marathi, Nepali, Sanskrit, Santali -> Hindi
+  brx: ['hi', 'mr'],
+  doi: ['hi', 'mr'],
+  kok: ['hi', 'mr'],
+  mai: ['hi', 'mr'],
+  mr: ['hi'],
+  ne: ['hi', 'mr'],
+  sa: ['hi'],
+  sat: ['hi', 'bn'],
+  // Bengali / Assamese Script Family: Assamese, Manipuri -> Bengali
+  as: ['bn'],
+  mni: ['bn'],
+  // Perso-Arabic Script Family: Kashmiri, Sindhi -> Urdu
+  ks: ['ur'],
+  sd: ['ur'],
+};
+
 export function LanguageProvider({ children }) {
   const [currentLanguage, setCurrentLanguage] = useState(() => {
     return localStorage.getItem('bizpartner_lang') || DEFAULT_LANGUAGE;
@@ -151,19 +170,40 @@ export function LanguageProvider({ children }) {
     document.documentElement.dir = langMeta.dir || 'ltr';
   }, [currentLanguage, langMeta]);
 
+  const lookupInLang = (lang, rawKey) => {
+    if (!lang || !rawKey || typeof rawKey !== 'string') return null;
+    const trimmed = rawKey.trim();
+
+    // 1. Direct key match in TRANSLATIONS
+    if (TRANSLATIONS[lang] && TRANSLATIONS[lang][trimmed]) {
+      return TRANSLATIONS[lang][trimmed];
+    }
+    // 2. Direct key match in REGIONAL_TERMS
+    if (REGIONAL_TERMS[lang] && REGIONAL_TERMS[lang][trimmed]) {
+      return REGIONAL_TERMS[lang][trimmed];
+    }
+    // 3. Case-insensitive or normalized lookup
+    if (TRANSLATIONS[lang]) {
+      const lowerKey = trimmed.toLowerCase();
+      const match = Object.keys(TRANSLATIONS[lang]).find(k => k.toLowerCase() === lowerKey);
+      if (match) return TRANSLATIONS[lang][match];
+    }
+
+    return null;
+  };
+
   const t = (key, fallback) => {
     if (!key) return '';
-    // 1. Check comprehensive TRANSLATIONS catalog for the current language
-    if (TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][key]) {
-      return TRANSLATIONS[currentLanguage][key];
-    }
-    // 2. Check REGIONAL_TERMS
-    if (REGIONAL_TERMS[currentLanguage] && REGIONAL_TERMS[currentLanguage][key]) {
-      return REGIONAL_TERMS[currentLanguage][key];
-    }
-    // 3. Check if key is a dot-separated path in enTranslations
-    if (typeof key === 'string' && key.includes('.')) {
-      const keys = key.split('.');
+    if (typeof key !== 'string') return key;
+    const strKey = key.trim();
+
+    // 1. Check current language
+    let result = lookupInLang(currentLanguage, strKey);
+    if (result) return result;
+
+    // 2. Check dot-separated path in enTranslations if key contains dots
+    if (strKey.includes('.')) {
+      const keys = strKey.split('.');
       let val = enTranslations;
       for (const k of keys) {
         if (val && typeof val === 'object' && k in val) {
@@ -174,17 +214,27 @@ export function LanguageProvider({ children }) {
         }
       }
       if (val && typeof val === 'string') {
-        if (TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][val]) {
-          return TRANSLATIONS[currentLanguage][val];
-        }
-        return val;
+        const pathMatch = lookupInLang(currentLanguage, val);
+        if (pathMatch) return pathMatch;
+        result = val;
       }
     }
-    // 4. If fallback provided and has a translation
-    if (fallback && TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][fallback]) {
-      return TRANSLATIONS[currentLanguage][fallback];
+
+    // 3. Script-Family Fallbacks (e.g. Bodo -> Hindi Devanagari, Assamese -> Bengali script, Kashmiri -> Urdu script)
+    const familyFallbacks = SCRIPT_FAMILY_FALLBACKS[currentLanguage] || [];
+    for (const fbLang of familyFallbacks) {
+      const fbResult = lookupInLang(fbLang, strKey);
+      if (fbResult) return fbResult;
     }
-    return fallback !== undefined ? fallback : key;
+
+    // 4. Fallback parameter translation check
+    if (fallback) {
+      const fallbackResult = lookupInLang(currentLanguage, fallback);
+      if (fallbackResult) return fallbackResult;
+      return fallback;
+    }
+
+    return result || strKey;
   };
 
   const changeLanguage = (code) => {

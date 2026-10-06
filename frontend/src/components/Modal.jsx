@@ -26,17 +26,23 @@ export default function Modal({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-backdrop modal-overlay" onClick={onClose} style={{ zIndex: 1000 }}>
       <div
-        className="modal-content"
-        style={{ maxWidth }}
+        className="modal-container modal-content"
+        style={{ maxWidth, width: '100%' }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >
         <div className="modal-header">
-          <h3>{title}</h3>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
+          <h3 className="modal-title">{title}</h3>
+          <button
+            type="button"
+            className="modal-close-btn"
+            onClick={onClose}
+            aria-label="Close modal"
+            style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: '4px' }}
+          >
             <CloseIcon size={18} />
           </button>
         </div>

@@ -54,26 +54,29 @@ export default function ReportsPage({ showToast }) {
 
   // Format line chart data
   const lineChartData = (report.salesByDate || []).map(d => ({
-    label: d.date.slice(5),
-    value: d.amount
+    label: d?.date ? String(d.date).slice(5) : '',
+    value: Number(d?.amount) || 0
   }));
 
   // Format bar chart data for top products
-  const topProductsBarData = (report.topProducts || []).slice(0, 6).map(p => ({
-    label: p.productName.length > 12 ? p.productName.slice(0, 10) + '..' : p.productName,
-    value: p.revenue
-  }));
+  const topProductsBarData = (report.topProducts || []).slice(0, 6).map(p => {
+    const name = p?.productName || 'Product';
+    return {
+      label: name.length > 12 ? name.slice(0, 10) + '..' : name,
+      value: Number(p?.revenue) || 0
+    };
+  });
 
   // Day of week sales data
   const dayOfWeekBarData = (report.salesByDayOfWeek || []).map(d => ({
-    label: d.date.slice(0, 3),
-    value: d.amount
+    label: d?.date ? String(d.date).slice(0, 3) : '',
+    value: Number(d?.amount) || 0
   }));
 
   // Monthly breakdown data
   const monthlyBarData = (report.salesByMonth || []).map(m => ({
-    label: m.date,
-    value: m.amount
+    label: m?.date ? String(m.date) : '',
+    value: Number(m?.amount) || 0
   }));
 
   return (

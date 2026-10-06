@@ -82,8 +82,8 @@ export default function GstPage({ showToast }) {
       {/* Header */}
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h1 className="page-title">GST Compliance & Tax Summary</h1>
-          <p className="page-subtitle">Track taxable supplies, output GST liability, and statutory filing deadlines</p>
+          <h1 className="page-title">{t('GST Invoice')}</h1>
+          <p className="page-subtitle">{t('Track GST tax invoices, output tax liability, and statutory filing deadlines')}</p>
         </div>
         <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
           + Add GST Reminder
@@ -105,7 +105,7 @@ export default function GstPage({ showToast }) {
       }}>
         <span style={{ fontSize: '1.2rem' }}>ℹ️</span>
         <div>
-          <strong>Compliance Advisory:</strong> Computations reflect sales recorded in BizPartner AI under standard 18% GST rules. Consult your qualified GST practitioner or Chartered Accountant for final filings on gst.gov.in.
+          <strong>Compliance Advisory:</strong> Computations reflect sales recorded in ProfitPilot AI under standard 18% GST rules. Consult your qualified GST practitioner or Chartered Accountant for final filings on gst.gov.in.
         </div>
       </div>
 
